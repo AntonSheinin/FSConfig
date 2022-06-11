@@ -1,4 +1,4 @@
-#FSConfig.py - Web Interface for Flussonic config file edit
+#FSConfig.py - Webface for Flussonic config file edit
 
 import json
 from bottle import route, run, template, request, debug, static_file
