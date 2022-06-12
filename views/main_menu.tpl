@@ -45,6 +45,13 @@ body {
    <a href="/config-download">Config Download</a>
 </div>
 
+Step 1 : Download .json config file from Flussonic admin page.
+Step 2 : Upload .json config file.
+Step 3 : Choose channels for multiple settings editing.
+Step 4 : Edit needed settings.
+Step 5 : Dowload edited .json config file.
+Step 6 : Upload edite .json config file to Flussonic admin page
+
 % if defined ('base') :
      {{!base}}
 

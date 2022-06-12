@@ -8,7 +8,7 @@
             			 <label for="{{name}}">{{name}}</label>
 		          </td>
         	   	          <td>
-			 <input type="number" name="{{name}}" />
+			 <input type="number" name="{{name}}" size="4"/>
             		          </td>
 		</tr>
     	     % end
