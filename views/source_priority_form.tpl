@@ -1,7 +1,5 @@
 % rebase('views/main_menu.tpl')
 
-<br>
-
 <form action="/source-priority" method="post" enctype="multipart/form-data">
 	If URL contains  <input type="text" name="firstCondition" value="" />
 	Than set priority on (0-9) <input type="number" name="firstConditionPriority" size="4" min="0" max="9"/><br><br>

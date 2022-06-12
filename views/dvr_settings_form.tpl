@@ -1,7 +1,5 @@
 % rebase('views/main_menu.tpl')
 
-<br>
-
 <form action="/dvr-settings" method="post" enctype="multipart/form-data">
 	DVR storage path               <input type="text" name="path" value="/mnt/storage/storage" /><br><br>
 	Disc space (Gb) (1-1000)   <input type="number" name="space" value=600 min="1" max="1000" size="4"/><br><br>
