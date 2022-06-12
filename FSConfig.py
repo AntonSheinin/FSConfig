@@ -1,7 +1,7 @@
 #FSConfig.py - Webface for Flussonic config file edit
 
 import json
-from bottle import route, run, template, request, debug, static_file
+from bottle import route, run, template, request, debug, static_file, error
 
 uploadedConfig = {}
 channelList = []
@@ -105,7 +105,11 @@ def ConfigUpload():
     global uploadedConfig
     global channelList
 
-    uploadedConfig = json.load(request.files.get('config').file)
+    #try:
+    #    uploadedConfig = json.load(request.files.get('config').file)
+    #
+    #except:
+    #    raise ValueError
 
     for stream in uploadedConfig['streams']:
        channelList.append(stream['name'])
@@ -119,6 +123,10 @@ def ConfigDownload():
         json.dump(uploadedConfig, file)
 
     return static_file('output_config.json', root='./', download=True)
+
+@error(404)
+def HTTPErrorHandling(code):
+    return template('views/http_error.tpl')
 
 def main():
 

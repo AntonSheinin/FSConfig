@@ -3,8 +3,8 @@
 <br>
 
 <form action="/dvr-settings" method="post" enctype="multipart/form-data">
-	DVR storage path     <input type="text" name="path" value="/mnt/storage/storage" /><br><br>
-	Disc space (Gb)	<input type="number" name="space" value=600 /><br><br>
+	DVR storage path               <input type="text" name="path" value="/mnt/storage/storage" /><br><br>
+	Disc space (Gb) (1-1000)   <input type="number" name="space" value=600 min="1" max="1000" size="4"/><br><br>
                   Archive duration       <select name="duration" id="duration">
 				<option value="0">None</option>
     				<option value="3600">1 hour</option>
