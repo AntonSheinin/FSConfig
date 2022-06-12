@@ -106,7 +106,7 @@ def ConfigUpload():
     global channelList
 
     #try:
-    #    uploadedConfig = json.load(request.files.get('config').file)
+    uploadedConfig = json.load(request.files.get('config').file)
     #
     #except:
     #    raise ValueError
