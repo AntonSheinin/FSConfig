@@ -1,3 +1,3 @@
-% rebase('views/main_menu.tpl')
+% rebase('templates/main_menu.tpl')
 
 <p> <br />Priority changing Complete </p>

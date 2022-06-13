@@ -1,4 +1,4 @@
-% rebase('views/main_menu.tpl')
+% rebase('templates/main_menu.tpl')
 
 <form action="/dvr-settings" method="post" enctype="multipart/form-data">
 	DVR storage path               <input type="text" name="path" value="/mnt/storage/storage" /><br><br>

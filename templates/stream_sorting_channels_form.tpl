@@ -1,4 +1,4 @@
-% rebase('views/main_menu.tpl')
+% rebase('templates/main_menu.tpl')
 
 <form action="/stream-sorting" method="POST"">
            <table>

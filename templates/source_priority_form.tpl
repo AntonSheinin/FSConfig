@@ -1,4 +1,4 @@
-% rebase('views/main_menu.tpl')
+% rebase('templates/main_menu.tpl')
 
 <form action="/source-priority" method="post" enctype="multipart/form-data">
 	If URL contains  <input type="text" name="firstCondition" value="" />
