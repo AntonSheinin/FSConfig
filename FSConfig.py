@@ -9,27 +9,27 @@ choosenChannels = []
 
 @route('/')
 def main_menu():
-    return template('views/main_menu.tpl')
+    return template('templates/main_menu.tpl')
 
 #@route('/choose-channels', method=[GET, POST])
 #def ShowChannelsListForm():
-#    return template('views/choose_channels_form.tpl', names = channelList)
+#    return template('templates/choose_channels_form.tpl', names = channelList)
 
 @route('/choose-channels', method=['GET', 'POST'])
 def ChooseChannels():
 
     if request.method == 'GET':
-        return template('views/choose_channels_form.tpl', names = channelList)
+        return template('templates/choose_channels_form.tpl', names = channelList)
 
     for channel in channelList:
         if request.forms.get(channel) == 'on':
             choosenChannels.append(channel)
 
-    return template('views/choosen_channels.tpl', names = choosenChannels)
+    return template('templates/choosen_channels.tpl', names = choosenChannels)
 
 @route('/dvr-settings')
 def DVRSettings():
-    return template('views/dvr_settings_form.tpl')
+    return template('templates/dvr_settings_form.tpl')
 
 @route('/dvr-settings', method='POST')
 def DVRSettings():
@@ -48,11 +48,11 @@ def DVRSettings():
             if dvrLimit == 0:
                 del stream['dvr']
 
-    return template('views/dvr_complete.tpl')
+    return template('templates/dvr_complete.tpl')
 
 @route('/source-priority')
 def ShowSourcePriorityForm():
-    return template('views/source_priority_form.tpl')
+    return template('templates/source_priority_form.tpl')
 
 @route('/source-priority', method='POST')
 def SourcePriority():
@@ -73,11 +73,11 @@ def SourcePriority():
                 else:
                     url['priority'] = defaultPriority
 
-    return template('views/source_priority_complete.tpl')
+    return template('templates/source_priority_complete.tpl')
 
 @route('/stream-sorting')
 def ShowStreamSortingForm():
-    return template('views/stream_sorting_channels_form.tpl', names = choosenChannels)
+    return template('templates/stream_sorting_channels_form.tpl', names = choosenChannels)
 
 @route('/stream-sorting', method='POST')
 def StreamSorting():
@@ -88,11 +88,11 @@ def StreamSorting():
 
     uploadedConfig['streams'].sort(key=lambda x: int(x.get('position')))
 
-    return template('views/sorting_complete.tpl')
+    return template('templates/sorting_complete.tpl')
 
 @route('/config-upload')
 def ShowUploadForm():
-    return template('views/upload_file_form.tpl')
+    return template('templates/upload_file_form.tpl')
 
 @route('/config-upload', method='POST')
 def ConfigUpload():
@@ -118,7 +118,7 @@ def ConfigDownload():
 
 @error(404)
 def HTTPErrorHandling(code):
-    return template('views/http_error.tpl')
+    return template('templates/http_error.tpl')
 
 def main():
 
