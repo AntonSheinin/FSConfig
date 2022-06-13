@@ -1,5 +1,4 @@
 #FSConfig.py - Webface for Flussonic config file edit
-#Autodeploytest1
 
 import json
 from bottle import route, run, template, request, debug, static_file, error
@@ -19,8 +18,6 @@ def ShowChannelsListForm():
 @route('/choose-channels', method='POST')
 def ChooseChannels():
 
-    #global choosenChannels
-
     for channel in channelList:
         if request.forms.get(channel) == 'on':
             choosenChannels.append(channel)
@@ -33,8 +30,6 @@ def DVRSettings():
 
 @route('/dvr-settings', method='POST')
 def DVRSettings():
-
-    #global uploadedConfig
 
     discSpace = int(request.forms.get('space')) * 1024 ** 3
     dvrLimit = int(request.forms.get('duration'))
@@ -58,8 +53,6 @@ def ShowSourcePriorityForm():
 
 @route('/source-priority', method='POST')
 def SourcePriority():
-
-    #global UploadedConfig
 
     firstCondition = request.forms.get('firstCondition')
     firstConditionPriority = request.forms.get('firstConditionPriority')
@@ -86,8 +79,6 @@ def ShowStreamSortingForm():
 @route('/stream-sorting', method='POST')
 def StreamSorting():
 
-    #global UploadedConfig
-
     for stream in uploadedConfig['streams']:
         if stream['name'] in choosenChannels:
             stream['position'] = request.forms.get(stream['name'])
@@ -102,9 +93,6 @@ def ShowUploadForm():
 
 @route('/config-upload', method='POST')
 def ConfigUpload():
-
-    #global uploadedConfig
-    #global channelList
 
     #try:
     uploadedConfig = json.load(request.files.get('config').file)
