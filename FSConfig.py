@@ -18,7 +18,7 @@ def ShowChannelsListForm():
 @route('/choose-channels', method='POST')
 def ChooseChannels():
 
-    global choosenChannels
+    #global choosenChannels
 
     for channel in channelList:
         if request.forms.get(channel) == 'on':
@@ -33,7 +33,7 @@ def DVRSettings():
 @route('/dvr-settings', method='POST')
 def DVRSettings():
 
-    global uploadedConfig
+    #global uploadedConfig
 
     discSpace = int(request.forms.get('space')) * 1024 ** 3
     dvrLimit = int(request.forms.get('duration'))
@@ -58,7 +58,7 @@ def ShowSourcePriorityForm():
 @route('/source-priority', method='POST')
 def SourcePriority():
 
-    global UploadedConfig
+    #global UploadedConfig
 
     firstCondition = request.forms.get('firstCondition')
     firstConditionPriority = request.forms.get('firstConditionPriority')
@@ -85,7 +85,7 @@ def ShowStreamSortingForm():
 @route('/stream-sorting', method='POST')
 def StreamSorting():
 
-    global UploadedConfig
+    #global UploadedConfig
 
     for stream in uploadedConfig['streams']:
         if stream['name'] in choosenChannels:
@@ -102,8 +102,8 @@ def ShowUploadForm():
 @route('/config-upload', method='POST')
 def ConfigUpload():
 
-    global uploadedConfig
-    global channelList
+    #global uploadedConfig
+    #global channelList
 
     #try:
     uploadedConfig = json.load(request.files.get('config').file)
