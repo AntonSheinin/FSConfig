@@ -11,10 +11,6 @@ choosenChannels = []
 def main_menu():
     return template('templates/main_menu.tpl')
 
-#@route('/choose-channels', method=[GET, POST])
-#def ShowChannelsListForm():
-#    return template('templates/choose_channels_form.tpl', names = channelList)
-
 @route('/choose-channels', method=['GET', 'POST'])
 def ChooseChannels():
 
@@ -27,12 +23,11 @@ def ChooseChannels():
 
     return template('templates/choosen_channels.tpl', names = choosenChannels)
 
-@route('/dvr-settings')
+@route('/dvr-settings', method=['GET','POST'])
 def DVRSettings():
-    return template('templates/dvr_settings_form.tpl')
 
-@route('/dvr-settings', method='POST')
-def DVRSettings():
+    if request.method == 'GET':
+        return template('templates/dvr_settings_form.tpl')
 
     discSpace = int(request.forms.get('space')) * 1024 ** 3
     dvrLimit = int(request.forms.get('duration'))
@@ -50,12 +45,11 @@ def DVRSettings():
 
     return template('templates/dvr_complete.tpl')
 
-@route('/source-priority')
-def ShowSourcePriorityForm():
-    return template('templates/source_priority_form.tpl')
-
-@route('/source-priority', method='POST')
+@route('/source-priority', method=['GET','POST'])
 def SourcePriority():
+
+    if request.method == 'GET':
+        return template('templates/source_priority_form.tpl')
 
     firstCondition = request.forms.get('firstCondition')
     firstConditionPriority = request.forms.get('firstConditionPriority')
@@ -75,12 +69,11 @@ def SourcePriority():
 
     return template('templates/source_priority_complete.tpl')
 
-@route('/stream-sorting')
-def ShowStreamSortingForm():
-    return template('templates/stream_sorting_channels_form.tpl', names = choosenChannels)
-
-@route('/stream-sorting', method='POST')
+@route('/stream-sorting', method=['GET','POST'])
 def StreamSorting():
+
+    if request.method == 'GET':
+        return template('templates/stream_sorting_channels_form.tpl', names = choosenChannels)
 
     for stream in uploadedConfig['streams']:
         if stream['name'] in choosenChannels:
@@ -90,12 +83,11 @@ def StreamSorting():
 
     return template('templates/sorting_complete.tpl')
 
-@route('/config-upload')
-def ShowUploadForm():
-    return template('templates/upload_file_form.tpl')
-
-@route('/config-upload', method='POST')
+@route('/config-upload', method=['GET','POST'])
 def ConfigUpload():
+
+    if request.method == 'GET':
+        return template('templates/upload_file_form.tpl')
 
     #try:
     uploadedConfig = json.load(request.files.get('config').file)
