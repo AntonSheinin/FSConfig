@@ -106,7 +106,7 @@ def ConfigUpload():
     for stream in uploadedConfig['streams']:
        channelList.append(stream['name'])
 
-    return template('views/upload_complete.tpl')
+    return template('templates/upload_complete.tpl')
 
 @route('/config-download')
 def ConfigDownload():
