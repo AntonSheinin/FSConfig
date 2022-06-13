@@ -1,4 +1,4 @@
-#FSConfig.py - Webface for Flussonic config file edit
+#fsconfig.py - Webface for Flussonic config file edit
 
 import json
 from bottle import route, run, template, request, debug, static_file, error
@@ -11,12 +11,15 @@ choosenChannels = []
 def main_menu():
     return template('views/main_menu.tpl')
 
-@route('/choose-channels')
-def ShowChannelsListForm():
-    return template('views/choose_channels_form.tpl', names = channelList)
+#@route('/choose-channels', method=[GET, POST])
+#def ShowChannelsListForm():
+#    return template('views/choose_channels_form.tpl', names = channelList)
 
-@route('/choose-channels', method='POST')
+@route('/choose-channels', method=['GET', 'POST'])
 def ChooseChannels():
+
+    if request.method == 'GET':
+        return template('views/choose_channels_form.tpl', names = channelList)
 
     for channel in channelList:
         if request.forms.get(channel) == 'on':
