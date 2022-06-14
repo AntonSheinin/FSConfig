@@ -104,8 +104,6 @@ def StreamSorting():
 
 def ConfigUpload():
 
-    #global uploadedConfig
-
     if request.method == 'GET':
         return template('templates/upload_file_form.tpl')
 
@@ -136,8 +134,8 @@ def HTTPErrorHandling(code):
 def main():
 
     debug(True)
-    #run(host='10.100.102.6', port=8080)
-    run(host='127.0.0.1', port=8080)
+    run(host='10.100.102.6', port=8080)
+    #run(host='127.0.0.1', port=8080)
 
 if __name__ == '__main__':
     main()
