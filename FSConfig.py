@@ -7,11 +7,33 @@ uploadedConfig = {}
 channelList = []
 choosenChannels = []
 
+allowedIP = ['127.0.0.1', '62.90.52.94', '10.168.253.10']
+menuLinks = {'main-menu' : 'MainMenu',
+             'choose-channels' : 'ChooseChannels',
+             'dvr-settings' : 'DVRSettings',
+             'source-priority' : 'SourcePriority',
+             'stream-sorting' : 'StreamSorting',
+             'config-upload' : 'ConfigUpload',
+             'config-download' : 'ConfigDownload'}
+
+@route('/<url>', method=['GET','POST'])
+def Router(url):
+
+    if request.environ.get('HTTP_X_FORWARDED_FOR') is not None and request.environ.get('HTTP_X_FORWARDED_FOR') not in allowedIP or request.environ.get('REMOTE_ADDR') not in allowedIP:
+        return(HTTPErrorHandling(403))
+
+    if url in menuLinks:
+        return(globals()[menuLinks[url]]())
+
+    return(HTTPErrorHandling(404))
+
 @route('/')
-def main_menu():
+def RouterWrapper():
+    return Router('main-menu')
+
+def MainMenu():
     return template('templates/main_menu.tpl')
 
-@route('/choose-channels', method=['GET', 'POST'])
 def ChooseChannels():
 
     if request.method == 'GET':
@@ -23,7 +45,6 @@ def ChooseChannels():
 
     return template('templates/choosen_channels.tpl', names = choosenChannels)
 
-@route('/dvr-settings', method=['GET','POST'])
 def DVRSettings():
 
     if request.method == 'GET':
@@ -45,7 +66,6 @@ def DVRSettings():
 
     return template('templates/dvr_complete.tpl')
 
-@route('/source-priority', method=['GET','POST'])
 def SourcePriority():
 
     if request.method == 'GET':
@@ -69,7 +89,6 @@ def SourcePriority():
 
     return template('templates/source_priority_complete.tpl')
 
-@route('/stream-sorting', method=['GET','POST'])
 def StreamSorting():
 
     if request.method == 'GET':
@@ -83,14 +102,15 @@ def StreamSorting():
 
     return template('templates/sorting_complete.tpl')
 
-@route('/config-upload', method=['GET','POST'])
 def ConfigUpload():
+
+    #global uploadedConfig
 
     if request.method == 'GET':
         return template('templates/upload_file_form.tpl')
 
     #try:
-    uploadedConfig = json.load(request.files.get('config').file)
+    uploadedConfig.update(json.load(request.files.get('config').file))
     #
     #except:
     #    raise ValueError
@@ -100,7 +120,6 @@ def ConfigUpload():
 
     return template('templates/upload_complete.tpl')
 
-@route('/config-download')
 def ConfigDownload():
 
     with open('./output_config.json', 'w') as file:
@@ -108,14 +127,17 @@ def ConfigDownload():
 
     return static_file('output_config.json', root='./', download=True)
 
-@error(404)
 def HTTPErrorHandling(code):
-    return template('templates/http_error.tpl')
+    if code == 403:
+        return('access denied')
+    if code == 404:
+        return('page doesnt exist')
 
 def main():
 
     debug(True)
-    run(host='10.100.102.6', port=8080)
+    #run(host='10.100.102.6', port=8080)
+    run(host='127.0.0.1', port=8080)
 
 if __name__ == '__main__':
     main()
