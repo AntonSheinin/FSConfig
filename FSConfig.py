@@ -1,4 +1,4 @@
-#fsconfig.py - Webface for Flussonic config file edit
+#fsconfig.py - Webface for Flussonic mutliple streams config file edit
 
 import json
 from bottle import route, run, template, request, debug, static_file, error
