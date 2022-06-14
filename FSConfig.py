@@ -7,7 +7,7 @@ uploadedConfig = {}
 channelList = []
 choosenChannels = []
 
-allowedIP = ['127.0.0.1', '62.90.52.94', '10.168.253.10']
+allowedIP = ['127.0.0.1', '62.90.52.94', '94.130.136.116']
 menuLinks = {'main-menu' : 'MainMenu',
              'choose-channels' : 'ChooseChannels',
              'dvr-settings' : 'DVRSettings',
