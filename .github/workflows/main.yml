@@ -1,0 +1,17 @@
+name: deploy on remote server
+on: [push]
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: executing remote ssh commands using key
+      uses: appleboy/ssh-action@master
+      with:
+        host: 62.90.52.94
+        username: epica
+        key: ${{ secrets.KEY }}
+        port: 22
+        script: |
+            cd ~/Python/FSConfig
+            git pull origin master
