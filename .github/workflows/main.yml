@@ -8,10 +8,10 @@ jobs:
     - name: executing remote ssh commands using key
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
+        host: 62.90.52.94
+        username: epica
         key: ${{ secrets.KEY }}
-        port: ${{ secrets.PORT }}
+        port: 22
         script: |
             cd ~/Python/FSConfig
             git pull origin master
