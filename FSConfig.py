@@ -1,4 +1,4 @@
-#fsconfig.py - Webface for Flussonic mutliple streams config file edit
+#fsconfig.py - Webapp for Flussonic mutliple streams config file edit
 
 import json
 from bottle import route, run, template, request, debug, static_file, error
@@ -30,6 +30,12 @@ def Router(url):
 @route('/')
 def RouterWrapper():
     return Router('main-menu')
+
+def HTTPErrorHandling(code):
+    if code == 403:
+        return('access denied')
+    if code == 404:
+        return('page doesnt exist')
 
 def MainMenu():
     return template('templates/main_menu.tpl')
@@ -124,12 +130,6 @@ def ConfigDownload():
         json.dump(uploadedConfig, file)
 
     return static_file('output_config.json', root='./', download=True)
-
-def HTTPErrorHandling(code):
-    if code == 403:
-        return('access denied')
-    if code == 404:
-        return('page doesnt exist')
 
 def main():
 
