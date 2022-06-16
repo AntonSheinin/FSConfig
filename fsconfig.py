@@ -1,6 +1,7 @@
 #fsconfig.py - Webapp for Flussonic mutliple streams config file edit
 
 import json
+import redis
 from bottle import route, run, template, request, debug, static_file, error
 
 uploadedConfig = {}
@@ -113,11 +114,10 @@ def ConfigUpload():
     if request.method == 'GET':
         return template('templates/upload_file_form.tpl')
 
-    #try:
+    #client = redis.Redis(host='localhost', port=6379, db=0)
+
+
     uploadedConfig.update(json.load(request.files.get('config').file))
-    #
-    #except:
-    #    raise ValueError
 
     for stream in uploadedConfig['streams']:
        channelList.append(stream['name'])
@@ -133,7 +133,8 @@ def ConfigDownload():
 
 def main():
 
-    run(server='gunicorn', host='10.100.102.6', port=8080, reloader=True)
+    app = bottle.default_app()
+    #run(server='gunicorn', host='10.100.102.6', port=8080)
     #run(host='127.0.0.1', port=8080)
 
 if __name__ == '__main__':
