@@ -2,7 +2,7 @@
 
 import json
 #import redis
-from bottle import route, run, template, request, debug, static_file, error
+from bottle import route, run, template, request, debug, static_file, error, default_app
 
 uploadedConfig = {}
 channelList = []
@@ -135,7 +135,8 @@ def ConfigDownload():
 
     #run(server='gunicorn', host='10.100.102.6', port=8080)
     #run(host='127.0.0.1', port=8080)
+app = default_app()
 
-if __name__ == '__main__':
-    app = bottle.default_app()
+#if __name__ == '__main__':
+    #app = default_app()
     #main()
