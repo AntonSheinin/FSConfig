@@ -134,9 +134,8 @@ def ConfigDownload():
 def main():
 
     #debug(True)
-    #run(host='10.100.102.6', port=8080, reloader=True)
+    run(server='gunicorn', host='10.100.102.6', port=8080, reloader=True)
     #run(host='127.0.0.1', port=8080)
-    app = bottle.default_app()
 
 if __name__ == '__main__':
     main()
