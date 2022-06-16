@@ -131,11 +131,11 @@ def ConfigDownload():
 
     return static_file('output_config.json', root='./', download=True)
 
-def main():
+#def main():
 
     #run(server='gunicorn', host='10.100.102.6', port=8080)
     #run(host='127.0.0.1', port=8080)
 
 if __name__ == '__main__':
     app = bottle.default_app()
-    main()
+    #main()
