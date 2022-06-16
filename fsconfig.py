@@ -1,7 +1,7 @@
 #fsconfig.py - Webapp for Flussonic mutliple streams config file edit
 
 import json
-import redis
+#import redis
 from bottle import route, run, template, request, debug, static_file, error
 
 uploadedConfig = {}
