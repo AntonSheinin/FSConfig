@@ -13,5 +13,5 @@ jobs:
         key: ${{ secrets.KEY }}
         port: 22
         script: |
-            cd ~/Python/FSConfig
+            cd ~/python/fsconfig
             git pull origin master
