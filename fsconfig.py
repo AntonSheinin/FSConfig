@@ -1,7 +1,8 @@
 #fsconfig.py - Webapp for Flussonic mutliple streams config file edit
 
 import json
-#import redis
+import redis
+from redis.commands.json.path import Path
 from bottle import route, run, template, request, debug, static_file, error, default_app
 
 uploadedConfig = {}
@@ -16,6 +17,8 @@ menuLinks = {'main-menu' : 'MainMenu',
              'stream-sorting' : 'StreamSorting',
              'config-upload' : 'ConfigUpload',
              'config-download' : 'ConfigDownload'}
+
+redisClient = redis.Redis(host='localhost', port=6379, db=0)
 
 @route('/<url>', method=['GET','POST'])
 def Router(url):
@@ -114,13 +117,14 @@ def ConfigUpload():
     if request.method == 'GET':
         return template('templates/upload_file_form.tpl')
 
-    #client = redis.Redis(host='localhost', port=6379, db=0)
+    redisClient.json().set('uploadedConfig', Path.root_path(), json.dumps(request.files.get('config'.file)))
 
+    #uploadedConfig.update(json.load(request.files.get('config').file))
 
-    uploadedConfig.update(json.load(request.files.get('config').file))
-
-    for stream in uploadedConfig['streams']:
-       channelList.append(stream['name'])
+    for stream in redisClient.json().get('uploadedConfig', Path('.streams')):
+        channelList.append(stream['name'])
+    #for stream in uploadedConfig['streams']:
+    #   channelList.append(stream['name'])
 
     return template('templates/upload_complete.tpl')
 
@@ -131,11 +135,11 @@ def ConfigDownload():
 
     return static_file('output_config.json', root='./', download=True)
 
-#test comment for gunicorn reload
 #def main():
 
     #run(server='gunicorn', host='10.100.102.6', port=8080)
     #run(host='127.0.0.1', port=8080)
+
 app = default_app()
 
 #if __name__ == '__main__':
