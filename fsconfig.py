@@ -36,6 +36,7 @@ def RouterWrapper():
     return Router('main-menu')
 
 def HTTPErrorHandling(code):
+
     if code == 403:
         return('access denied')
     if code == 404:
@@ -47,6 +48,8 @@ def MainMenu():
 def ChooseChannels():
 
     if request.method == 'GET':
+        for stream in redisClient.json().get('uploadedConfig', Path('.streams')):
+            channelList.append(stream['name'])
         return template('templates/choose_channels_form.tpl', names = channelList)
 
     for channel in channelList:
@@ -59,6 +62,8 @@ def DVRSettings():
 
     if request.method == 'GET':
         return template('templates/dvr_settings_form.tpl')
+
+    uploadedConfig = redisClient.json().get('uploadedConfig', Path.root_path())
 
     discSpace = int(request.forms.get('space')) * 1024 ** 3
     dvrLimit = int(request.forms.get('duration'))
@@ -74,12 +79,16 @@ def DVRSettings():
             if dvrLimit == 0:
                 del stream['dvr']
 
+    redisClient.json().set('uploadedConfig', Path.root_path(), uploadedConfig)
+
     return template('templates/dvr_complete.tpl')
 
 def SourcePriority():
 
     if request.method == 'GET':
         return template('templates/source_priority_form.tpl')
+
+    uploadedConfig = redisClient.json().get('uploadedConfig', Path.root_path())
 
     firstCondition = request.forms.get('firstCondition')
     firstConditionPriority = request.forms.get('firstConditionPriority')
@@ -97,9 +106,13 @@ def SourcePriority():
                 else:
                     url['priority'] = defaultPriority
 
+    redisClient.json().set('uploadedConfig', Path.root_path(), uploadedConfig)
+
     return template('templates/source_priority_complete.tpl')
 
 def StreamSorting():
+
+    uploadedConfig = redisClient.json().get('uploadedConfig', Path.root_path())
 
     if request.method == 'GET':
         return template('templates/stream_sorting_channels_form.tpl', names = choosenChannels)
@@ -110,6 +123,8 @@ def StreamSorting():
 
     uploadedConfig['streams'].sort(key=lambda x: int(x.get('position')))
 
+    redisClient.json().set('uploadedConfig', Path.root_path(), uploadedConfig)
+
     return template('templates/sorting_complete.tpl')
 
 def ConfigUpload():
@@ -119,20 +134,12 @@ def ConfigUpload():
 
     redisClient.json().set('uploadedConfig', Path.root_path(), json.load(request.files.get('config').file))
 
-    #uploadedConfig.update(json.load(request.files.get('config').file))
-
-    for stream in redisClient.json().get('uploadedConfig', Path('.streams')):
-        channelList.append(stream['name'])
-
-    #for stream in uploadedConfig['streams']:
-    #channelList.append(stream['name'])
-
     return template('templates/upload_complete.tpl')
 
 def ConfigDownload():
 
     with open('./output_config.json', 'w') as file:
-        json.dump(uploadedConfig, file)
+        json.dump(redisClient.json().get('uploadedConfig', Path.root_path()), file)
 
     return static_file('output_config.json', root='./', download=True)
 
