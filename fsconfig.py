@@ -117,7 +117,7 @@ def ConfigUpload():
     if request.method == 'GET':
         return template('templates/upload_file_form.tpl')
 
-    redisClient.json().set('uploadedConfig', Path.root_path(), json.dumps(request.files.get('config').file))
+    redisClient.json().set('uploadedConfig', Path.root_path(), json.dumps(json.load(request.files.get('config').file))
 
     #uploadedConfig.update(json.load(request.files.get('config').file))
 
