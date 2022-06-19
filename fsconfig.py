@@ -21,6 +21,13 @@ menuLinks = {'main-menu' : 'MainMenu',
 
 redisClient = redis.Redis(host='localhost', port=6379, db=0)
 
+def DataUpdate(func):
+    def Wrapper():
+        uploadedConfig = redisClient.json().get('uploadedConfig', Path.root_path())
+        func()
+        redisClient.json().set('uploadedConfig', Path.root_path(), uploadedConfig)
+    return Wrapper
+
 @route('/<url>', method=['GET','POST'])
 def Router(url):
 
@@ -59,12 +66,13 @@ def ChooseChannels():
 
     return template('templates/choosen_channels.tpl', names = choosenChannels)
 
+@DataUpdate
 def DVRSettings():
 
     if request.method == 'GET':
         return template('templates/dvr_settings_form.tpl')
 
-    uploadedConfig = redisClient.json().get('uploadedConfig', Path.root_path())
+    #uploadedConfig = redisClient.json().get('uploadedConfig', Path.root_path())
 
     discSpace = int(request.forms.get('space')) * 1024 ** 3
     dvrLimit = int(request.forms.get('duration'))
@@ -80,7 +88,7 @@ def DVRSettings():
             if dvrLimit == 0:
                 del stream['dvr']
 
-    redisClient.json().set('uploadedConfig', Path.root_path(), uploadedConfig)
+    #redisClient.json().set('uploadedConfig', Path.root_path(), uploadedConfig)
 
     return template('templates/dvr_complete.tpl')
 
@@ -145,8 +153,7 @@ def ConfigDownload():
     return static_file('output_config.json', root='./', download=True)
 
 #def main():
-
-#    run(server='gunicorn', host='10.100.102.6', port=8080)
+#   run(server='gunicorn', host='10.100.102.6', port=8080)
     #run(host='127.0.0.1', port=8080)
 
 app = default_app()
