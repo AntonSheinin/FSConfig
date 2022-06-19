@@ -8,6 +8,7 @@ from bottle import route, run, template, request, debug, static_file, error, def
 uploadedConfig = {}
 channelList = []
 choosenChannels = []
+#test
 
 allowedIP = ['127.0.0.1', '62.90.52.94', '94.130.136.116', '185.180.103.78']
 menuLinks = {'main-menu' : 'MainMenu',
