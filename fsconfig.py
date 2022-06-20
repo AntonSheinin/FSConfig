@@ -8,7 +8,6 @@ from bottle import route, run, template, request, debug, static_file, error, def
 uploadedConfig = {}
 channelList = []
 choosenChannels = []
-#test
 
 allowedIP = ['127.0.0.1', '62.90.52.94', '94.130.136.116', '185.180.103.78']
 menuLinks = {'main-menu' : 'MainMenu',
@@ -24,8 +23,10 @@ redisClient = redis.Redis(host='localhost', port=6379, db=0)
 def DataUpdate(func):
     def Wrapper():
         uploadedConfig = redisClient.json().get('uploadedConfig', Path.root_path())
-        func()
+        output = func()
         redisClient.json().set('uploadedConfig', Path.root_path(), uploadedConfig)
+        return output
+
     return Wrapper
 
 @route('/<url>', method=['GET','POST'])
