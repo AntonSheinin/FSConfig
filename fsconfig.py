@@ -72,7 +72,7 @@ def ChooseChannels():
 def DVRSettings(config):
 
     if request.method == 'GET':
-        return template('templates/dvr_settings_form.tpl'), 0
+        return template('templates/dvr_settings_form.tpl'), config
 
     #uploadedConfig = redisClient.json().get('uploadedConfig', Path.root_path())
 
