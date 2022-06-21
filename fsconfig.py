@@ -42,7 +42,7 @@ def Router(url):
 
 @route('/')
 def RouterWrapper():
-        Router('main-menu')
+        return Router('main-menu')
 
 def HTTPErrorHandling(code):
 
