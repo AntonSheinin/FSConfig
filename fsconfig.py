@@ -24,11 +24,11 @@ def ConfigLoadUpdate(func):
     def Wrapper():
         uploadedConfig = redisClient.json().get('uploadedConfig', Path.root_path())
         print('after upload')
-        print(uploadedConfig)
+        #print(uploadedConfig.keys())
         output = func()
         redisClient.json().set('uploadedConfig', Path.root_path(), uploadedConfig)
         print('after saving')
-        print(uploadedConfig)
+        #print(uploadedConfig.keys())
 
         return output
 
@@ -85,7 +85,7 @@ def DVRSettings():
     dvrRoot = request.forms.get('path')
 
     print('after setting change')
-    print(uploadedConfig)
+    print(uploadedConfig.keys())
 
 
     for stream in uploadedConfig['streams']:
