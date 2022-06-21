@@ -27,7 +27,7 @@ def ConfigLoadUpdate(func):
         redisClient.json().set('uploadedConfig', Path.root_path(), uploadedConfig)
         return output
 
-   return Wrapper
+    return Wrapper
 
 @route('/<url>', method=['GET','POST'])
 def Router(url):
