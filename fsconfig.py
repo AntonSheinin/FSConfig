@@ -69,7 +69,7 @@ def ChooseChannels():
     return template('templates/choosen_channels.tpl', names = choosenChannels)
 
 @ConfigLoadUpdate
-def DVRSettings(uploadedConfig):
+def DVRSettings(config):
 
     if request.method == 'GET':
         return template('templates/dvr_settings_form.tpl')
@@ -80,7 +80,7 @@ def DVRSettings(uploadedConfig):
     dvrLimit = int(request.forms.get('duration'))
     dvrRoot = request.forms.get('path')
 
-    for stream in uploadedConfig['streams']:
+    for stream in config['streams']:
         if stream['name'] in choosenChannels:
             stream['dvr'] = {"disk_space" : discSpace,
                              "dvr_limit" : dvrLimit,
