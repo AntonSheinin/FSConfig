@@ -24,8 +24,8 @@ def ConfigLoadUpdate(func):
     def Wrapper():
         uploadedConfig.update(redisClient.json().get('uploadedConfig', Path.root_path()))
         output = func(uploadedConfig)
-        redisClient.json().set('uploadedConfig', Path.root_path(), uploadedConfig)
-        return output
+        redisClient.json().set('uploadedConfig', Path.root_path(), output[1])
+        return output[0]
 
     return Wrapper
 
@@ -92,7 +92,7 @@ def DVRSettings(config):
 
     #redisClient.json().set('uploadedConfig', Path.root_path(), uploadedConfig)
 
-    return template('templates/dvr_complete.tpl')
+    return template('templates/dvr_complete.tpl'), config
 
 @ConfigLoadUpdate
 def SourcePriority():
