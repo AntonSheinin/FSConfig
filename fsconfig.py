@@ -9,7 +9,7 @@ uploadedConfig = {}
 channelList = []
 choosenChannels = []
 
-allowedIP = ['127.0.0.1', '62.90.52.94', '94.130.136.116', '185.180.103.78', '']
+allowedIP = ['127.0.0.1', '62.90.52.94', '94.130.136.116', '185.180.103.78']
 menuLinks = {'main-menu' : 'MainMenu',
              'choose-channels' : 'ChooseChannels',
              'dvr-settings' : 'DVRSettings',
@@ -32,8 +32,8 @@ def ConfigLoadUpdate(func):
 @route('/<url>', method=['GET','POST'])
 def Router(url):
 
-    if request.environ.get('HTTP_X_FORWARDED_FOR') is not None and request.environ.get('HTTP_X_FORWARDED_FOR') not in allowedIP or request.environ.get('REMOTE_ADDR') not in allowedIP:
-        return(HTTPErrorHandling(403))
+    #if request.environ.get('HTTP_X_FORWARDED_FOR') is not None and request.environ.get('HTTP_X_FORWARDED_FOR') not in allowedIP or request.environ.get('REMOTE_ADDR') not in allowedIP:
+    #    return(HTTPErrorHandling(403))
 
     if url in menuLinks:
         return(globals()[menuLinks[url]]())
