@@ -9,7 +9,7 @@ uploadedConfig = {}
 channelList = []
 choosenChannels = []
 
-allowedIP = ['127.0.0.1', '62.90.52.94', '94.130.136.116', '185.180.103.78']
+allowedIP = ['127.0.0.1', '62.90.52.94', '94.130.136.116', '185.180.103.78', '']
 menuLinks = {'main-menu' : 'MainMenu',
              'choose-channels' : 'ChooseChannels',
              'dvr-settings' : 'DVRSettings',
@@ -47,7 +47,7 @@ def RouteWrapper():
 def HTTPErrorHandling(code):
 
     if code == 403:
-        return('REMOTE_ADDR')
+        return('access denied')
     if code == 404:
         return('page doesnt exist')
 
