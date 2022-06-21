@@ -23,8 +23,13 @@ redisClient = redis.Redis(host='localhost', port=6379, db=0)
 def ConfigLoadUpdate(func):
     def Wrapper():
         uploadedConfig = redisClient.json().get('uploadedConfig', Path.root_path())
+        print('after upload')
+        print(uploadedConfig)
         output = func()
         redisClient.json().set('uploadedConfig', Path.root_path(), uploadedConfig)
+        print('after saving')
+        print(uploadedConfig)
+
         return output
 
     return Wrapper
@@ -79,13 +84,17 @@ def DVRSettings():
     dvrLimit = int(request.forms.get('duration'))
     dvrRoot = request.forms.get('path')
 
+    print('after setting change')
+    print(uploadedConfig)
+
+
     for stream in uploadedConfig['streams']:
         if stream['name'] in choosenChannels:
-            stream['dvr'] = {"disk_space": discSpace,
-                             "dvr_limit":dvrLimit,
-                             "expiration":dvrLimit,
-                             "root":dvrRoot,
-                             "storage_limit":discSpace}
+            stream['dvr'] = {"disk_space" : discSpace,
+                             "dvr_limit" : dvrLimit,
+                             "expiration" : dvrLimit,
+                             "root" : dvrRoot,
+                             "storage_limit" : discSpace}
             if dvrLimit == 0:
                 del stream['dvr']
 
