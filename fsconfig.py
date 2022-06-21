@@ -22,7 +22,7 @@ redisClient = redis.Redis(host='localhost', port=6379, db=0)
 
 def ConfigLoadUpdate(func):
     def Wrapper():
-        uploadedConfig = redisClient.json().get('uploadedConfig', Path.root_path())
+        uploadedConfig.update(redisClient.json().get('uploadedConfig', Path.root_path()))
         print('after upload')
         #print(uploadedConfig.keys())
         output = func()
