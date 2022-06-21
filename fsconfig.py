@@ -1,4 +1,4 @@
-#fsconfig.py - Webapp for Flussonic mutliple streams config file edit
+#fsconfig.py - Webapp for Flussonic Streaming Server mutliple streams configedit
 
 import json
 import redis
