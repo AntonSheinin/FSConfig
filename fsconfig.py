@@ -32,8 +32,8 @@ def ConfigLoadUpdate(func):
 @route('/<url>', method=['GET','POST'])
 def Router(url):
 
-    #if request.environ.get('HTTP_X_FORWARDED_FOR') is not None and request.environ.get('HTTP_X_FORWARDED_FOR') not in allowedIP or request.environ.get('REMOTE_ADDR') not in allowedIP:
-    #    return(HTTPErrorHandling(403))
+    if request.environ.get('HTTP_X_FORWARDED_FOR') is not None and request.environ.get('HTTP_X_FORWARDED_FOR') not in allowedIP or request.environ.get('REMOTE_ADDR') not in allowedIP:
+        return(HTTPErrorHandling(403))
 
     if url in menuLinks:
         return(globals()[menuLinks[url]]())
@@ -41,7 +41,7 @@ def Router(url):
     return(HTTPErrorHandling(404))
 
 @route('/')
-def RouteWrapper():
+def RouterWrapper():
         Router('main-menu')
 
 def HTTPErrorHandling(code):
