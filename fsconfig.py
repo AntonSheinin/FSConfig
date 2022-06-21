@@ -47,7 +47,7 @@ def RouteWrapper():
 def HTTPErrorHandling(code):
 
     if code == 403:
-        return('access denied'+'HTTP_X_FORWARDED_FOR')
+        return('REMOTE_ADDR')
     if code == 404:
         return('page doesnt exist')
 
