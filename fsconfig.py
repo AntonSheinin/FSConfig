@@ -10,7 +10,8 @@ channelList = []
 choosenChannels = []
 
 allowedIP = ['127.0.0.1', '62.90.52.94', '94.130.136.116', '185.180.103.78']
-menuLinks = {'choose-channels' : 'ChooseChannels',
+menuLinks = {'main-menu' : 'MainMenu',
+             'choose-channels' : 'ChooseChannels',
              'dvr-settings' : 'DVRSettings',
              'source-priority' : 'SourcePriority',
              'stream-sorting' : 'StreamSorting',
@@ -40,18 +41,18 @@ def Router(url):
     return(HTTPErrorHandling(404))
 
 @route('/')
-def MainMenu():
-    return template('templates/main_menu.tpl')
+def RouteWrapper():
+        Router('main-menu')
 
 def HTTPErrorHandling(code):
 
     if code == 403:
-        return('access denied')
+        return('access denied'+'HTTP_X_FORWARDED_FOR')
     if code == 404:
         return('page doesnt exist')
 
-#def MainMenu():
-#    return template('templates/main_menu.tpl')
+def MainMenu():
+    return template('templates/main_menu.tpl')
 
 def ChooseChannels():
 
