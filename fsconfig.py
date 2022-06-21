@@ -23,13 +23,8 @@ redisClient = redis.Redis(host='localhost', port=6379, db=0)
 def ConfigLoadUpdate(func):
     def Wrapper():
         uploadedConfig.update(redisClient.json().get('uploadedConfig', Path.root_path()))
-        print('after upload')
-        #print(uploadedConfig.keys())
         output = func()
         redisClient.json().set('uploadedConfig', Path.root_path(), uploadedConfig)
-        print('after saving')
-        #print(uploadedConfig.keys())
-
         return output
 
     return Wrapper
@@ -38,6 +33,7 @@ def ConfigLoadUpdate(func):
 def Router(url):
 
     if request.environ.get('HTTP_X_FORWARDED_FOR') is not None and request.environ.get('HTTP_X_FORWARDED_FOR') not in allowedIP or request.environ.get('REMOTE_ADDR') not in allowedIP:
+        print(request.environ.get('REMOTE_ADDR'))
         return(HTTPErrorHandling(403))
 
     if url in menuLinks:
