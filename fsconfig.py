@@ -5,7 +5,6 @@ import redis
 from redis.commands.json.path import Path
 from bottle import route, run, template, request, debug, static_file, error, default_app
 
-channelList = []
 choosenChannels = []
 
 allowedIP = ['127.0.0.1', '62.90.52.94', '94.130.136.116', '185.180.103.78']
@@ -134,7 +133,14 @@ def ConfigUpload():
     if request.method == 'GET':
         return template('templates/upload_file_form.tpl')
 
+    channelList = []
+
     redisClient.json().set('uploadedConfig', Path.root_path(), json.load(request.files.get('config').file))
+
+    for stream in redisClient.json().get('uploadedConfig', Path('.streams')):
+            channelList.append(stream['name'])
+
+    redisClient.set('channelList', channelList)
 
     return template('templates/upload_complete.tpl')
 
