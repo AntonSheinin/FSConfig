@@ -138,9 +138,7 @@ def ConfigUpload():
     redisClient.json().set('uploadedConfig', Path.root_path(), json.load(request.files.get('config').file))
 
     for stream in redisClient.json().get('uploadedConfig', Path('.streams')):
-            channelList.append(stream['name'])
-
-    redisClient.set('channelList', channelList)
+            redisClient.lpush('channelList', stream['name'])
 
     return template('templates/upload_complete.tpl')
 
