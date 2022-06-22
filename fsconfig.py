@@ -5,7 +5,6 @@ import redis
 from redis.commands.json.path import Path
 from bottle import route, run, template, request, debug, static_file, error, default_app
 
-uploadedConfig = {}
 channelList = []
 choosenChannels = []
 
@@ -22,6 +21,8 @@ redisClient = redis.Redis(host='localhost', port=6379, db=0)
 
 def ConfigLoadUpdate(func):
     def Wrapper():
+        uploadedConfig = {}
+
         uploadedConfig.update(redisClient.json().get('uploadedConfig', Path.root_path()))
         output = func(uploadedConfig)
         redisClient.json().set('uploadedConfig', Path.root_path(), output[1])
@@ -74,8 +75,6 @@ def DVRSettings(config):
     if request.method == 'GET':
         return template('templates/dvr_settings_form.tpl'), config
 
-    #uploadedConfig = redisClient.json().get('uploadedConfig', Path.root_path())
-
     discSpace = int(request.forms.get('space')) * 1024 ** 3
     dvrLimit = int(request.forms.get('duration'))
     dvrRoot = request.forms.get('path')
@@ -90,17 +89,13 @@ def DVRSettings(config):
             if dvrLimit == 0:
                 del stream['dvr']
 
-    #redisClient.json().set('uploadedConfig', Path.root_path(), uploadedConfig)
-
     return template('templates/dvr_complete.tpl'), config
 
 @ConfigLoadUpdate
-def SourcePriority():
+def SourcePriority(config):
 
     if request.method == 'GET':
-        return template('templates/source_priority_form.tpl')
-
-    #uploadedConfig = redisClient.json().get('uploadedConfig', Path.root_path())
+        return template('templates/source_priority_form.tpl'), config
 
     firstCondition = request.forms.get('firstCondition')
     firstConditionPriority = request.forms.get('firstConditionPriority')
@@ -108,7 +103,7 @@ def SourcePriority():
     secondConditionPriority = request.forms.get('secondConditionPriority')
     defaultPriority = request.forms.get('defaultPriority')
 
-    for stream in uploadedConfig['streams']:
+    for stream in config['streams']:
         if stream['name'] in choosenChannels:
             for url in stream['inputs']:
                 if firstCondition in url['url'] and firstCondition != '':
@@ -118,27 +113,21 @@ def SourcePriority():
                 else:
                     url['priority'] = defaultPriority
 
-    #redisClient.json().set('uploadedConfig', Path.root_path(), uploadedConfig)
-
-    return template('templates/source_priority_complete.tpl')
+    return template('templates/source_priority_complete.tpl'), config
 
 @ConfigLoadUpdate
-def StreamSorting():
-
-    #uploadedConfig = redisClient.json().get('uploadedConfig', Path.root_path())
+def StreamSorting(config):
 
     if request.method == 'GET':
-        return template('templates/stream_sorting_channels_form.tpl', names = choosenChannels)
+        return template('templates/stream_sorting_channels_form.tpl', names = choosenChannels), config
 
-    for stream in uploadedConfig['streams']:
+    for stream in config['streams']:
         if stream['name'] in choosenChannels:
             stream['position'] = request.forms.get(stream['name'])
 
-    uploadedConfig['streams'].sort(key=lambda x: int(x.get('position')))
+    config['streams'].sort(key=lambda x: int(x.get('position')))
 
-    #redisClient.json().set('uploadedConfig', Path.root_path(), uploadedConfig)
-
-    return template('templates/sorting_complete.tpl')
+    return template('templates/sorting_complete.tpl'), config
 
 def ConfigUpload():
 
