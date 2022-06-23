@@ -68,7 +68,7 @@ def ChooseChannels():
     if request.method == 'GET':
         return template('templates/choose_channels_form.tpl', names = channelList)
 
-    redisClient.ltrim('choosenChannels', 0, -1)
+    redisClient.ltrim('choosenChannels', 1, 0)
 
     for channel in channelList:
         if request.forms.get(channel) == 'on':
