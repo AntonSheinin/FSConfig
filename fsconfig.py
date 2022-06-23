@@ -62,9 +62,10 @@ def ChooseChannels():
     channelList = []
     choosenChannels = []
 
-    if request.method == 'GET':
-        for stream in redisClient.json().get('uploadedConfig', Path('.streams')):
+    for stream in redisClient.json().get('uploadedConfig', Path('.streams')):
             channelList.append(stream['name'])
+
+    if request.method == 'GET':
         return template('templates/choose_channels_form.tpl', names = channelList)
 
     for channel in channelList:
