@@ -19,7 +19,6 @@ redisClient = redis.Redis(host='localhost', port=6379, db=0)
 def ConfigLoadUpdate(func):
     def Wrapper():
         uploadedConfig = {}
-        choosenChannels = []
 
         uploadedConfig.update(redisClient.json().get('uploadedConfig', Path.root_path()))
         choosenChannels = str(redisClient.lrange('choosenChannels', 0, -1))
@@ -148,9 +147,6 @@ def ConfigUpload():
         return template('templates/upload_file_form.tpl')
 
     redisClient.json().set('uploadedConfig', Path.root_path(), json.load(request.files.get('config').file))
-
-    #for stream in redisClient.json().get('uploadedConfig', Path('.streams')):
-    #        redisClient.lpush('channelList', stream['name'])
 
     return template('templates/upload_complete.tpl')
 
