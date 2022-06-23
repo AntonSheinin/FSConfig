@@ -5,8 +5,6 @@ import redis
 from redis.commands.json.path import Path
 from bottle import route, run, template, request, debug, static_file, error, default_app
 
-choosenChannels = []
-
 allowedIP = ['127.0.0.1', '62.90.52.94', '94.130.136.116', '185.180.103.78']
 menuLinks = {'main-menu' : 'MainMenu',
              'choose-channels' : 'ChooseChannels',
@@ -21,9 +19,13 @@ redisClient = redis.Redis(host='localhost', port=6379, db=0)
 def ConfigLoadUpdate(func):
     def Wrapper():
         uploadedConfig = {}
+        ChoosenChannels = []
 
         uploadedConfig.update(redisClient.json().get('uploadedConfig', Path.root_path()))
-        output = func(uploadedConfig)
+        ChoosenChannels = redisClient.lrange('choosenChannels', 0, -1)
+
+        output = func(uploadedConfig, ChoosenChannels)
+
         redisClient.json().set('uploadedConfig', Path.root_path(), output[1])
         return output[0]
 
@@ -57,6 +59,9 @@ def MainMenu():
 
 def ChooseChannels():
 
+    channelList = []
+    choosenChannels = []
+
     if request.method == 'GET':
         for stream in redisClient.json().get('uploadedConfig', Path('.streams')):
             channelList.append(stream['name'])
@@ -64,34 +69,38 @@ def ChooseChannels():
 
     for channel in channelList:
         if request.forms.get(channel) == 'on':
+            redisClient.lpush('choosenChannels', channel)
             choosenChannels.append(channel)
-
+            
     return template('templates/choosen_channels.tpl', names = choosenChannels)
 
 @ConfigLoadUpdate
-def DVRSettings(config):
+def DVRSettings(config, choosenChannels):
 
     if request.method == 'GET':
         return template('templates/dvr_settings_form.tpl'), config
 
-    discSpace = int(request.forms.get('space')) * 1024 ** 3
+    discSpaceLimitGb = int(request.forms.get('space_limit_gb')) * 1024 ** 3
+    discSpaceLimitPerc = int(request.forms.get('space_limit_perc'))
     dvrLimit = int(request.forms.get('duration'))
     dvrRoot = request.forms.get('path')
 
     for stream in config['streams']:
         if stream['name'] in choosenChannels:
-            stream['dvr'] = {"disk_space" : discSpace,
+            stream['dvr'] = {"disk_space" : discSpaceLimitGb,
+                             "disk_limit" : discSpaceLimitPerc,
+                             "disk_usage_limit" : discSpaceLimitPerc,
                              "dvr_limit" : dvrLimit,
                              "expiration" : dvrLimit,
                              "root" : dvrRoot,
-                             "storage_limit" : discSpace}
+                             "storage_limit" : discSpaceLimitGb}
             if dvrLimit == 0:
                 del stream['dvr']
 
     return template('templates/dvr_complete.tpl'), config
 
 @ConfigLoadUpdate
-def SourcePriority(config):
+def SourcePriority(config, choosenChannels):
 
     if request.method == 'GET':
         return template('templates/source_priority_form.tpl'), config
@@ -115,7 +124,7 @@ def SourcePriority(config):
     return template('templates/source_priority_complete.tpl'), config
 
 @ConfigLoadUpdate
-def StreamSorting(config):
+def StreamSorting(config, choosenChannels):
 
     if request.method == 'GET':
         return template('templates/stream_sorting_channels_form.tpl', names = choosenChannels), config
@@ -133,12 +142,10 @@ def ConfigUpload():
     if request.method == 'GET':
         return template('templates/upload_file_form.tpl')
 
-    channelList = []
-
     redisClient.json().set('uploadedConfig', Path.root_path(), json.load(request.files.get('config').file))
 
-    for stream in redisClient.json().get('uploadedConfig', Path('.streams')):
-            redisClient.lpush('channelList', stream['name'])
+    #for stream in redisClient.json().get('uploadedConfig', Path('.streams')):
+    #        redisClient.lpush('channelList', stream['name'])
 
     return template('templates/upload_complete.tpl')
 
