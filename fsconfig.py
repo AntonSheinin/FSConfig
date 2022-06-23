@@ -133,8 +133,7 @@ def StreamSorting(config, choosenChannels):
         return template('templates/stream_sorting_channels_form.tpl', names = choosenChannels), config
 
     for stream in config['streams']:
-        print(stream['name'])
-        if stream['name'] in choosenChannels:
+        if stream['name'] in choosenChannels and request.forms.get(stream['name']) != '':
             stream['position'] = request.forms.get(stream['name'])
 
     config['streams'].sort(key=lambda x: int(x.get('position')))
