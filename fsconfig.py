@@ -19,12 +19,12 @@ redisClient = redis.Redis(host='localhost', port=6379, db=0)
 def ConfigLoadUpdate(func):
     def Wrapper():
         uploadedConfig = {}
-        ChoosenChannels = []
+        choosenChannels = []
 
         uploadedConfig.update(redisClient.json().get('uploadedConfig', Path.root_path()))
-        ChoosenChannels = redisClient.lrange('choosenChannels', 0, -1)
+        choosenChannels = redisClient.lrange('choosenChannels', 0, -1)
 
-        output = func(uploadedConfig, ChoosenChannels)
+        output = func(uploadedConfig, choosenChannels)
 
         redisClient.json().set('uploadedConfig', Path.root_path(), output[1])
         return output[0]
@@ -80,6 +80,8 @@ def DVRSettings(config, choosenChannels):
 
     if request.method == 'GET':
         return template('templates/dvr_settings_form.tpl'), config
+
+    print(choosenChannels)
 
     discSpaceLimitGb = int(request.forms.get('space_limit_gb')) * 1024 ** 3
     discSpaceLimitPerc = int(request.forms.get('space_limit_perc'))
