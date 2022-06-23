@@ -71,7 +71,7 @@ def ChooseChannels():
 
     for channel in channelList:
         if request.forms.get(channel) == 'on':
-            redisClient.lpush('choosenChannels', channel)
+            redisClient.rpush('choosenChannels', channel)
             choosenChannels.append(channel)
             
     return template('templates/choosen_channels.tpl', names = choosenChannels)
