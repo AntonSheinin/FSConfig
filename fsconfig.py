@@ -22,6 +22,7 @@ def ConfigLoadUpdate(func):
 
         uploadedConfig.update(redisClient.json().get('uploadedConfig', Path.root_path()))
         choosenChannels = str(redisClient.lrange('choosenChannels', 0, -1))
+        print (choosenChannels)
 
         output = func(uploadedConfig, choosenChannels)
 
