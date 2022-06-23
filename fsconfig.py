@@ -22,8 +22,7 @@ def ConfigLoadUpdate(func):
 
         uploadedConfig.update(redisClient.json().get('uploadedConfig', Path.root_path()))
         choosenChannels = redisClient.lrange('choosenChannels', 0, -1)
-        for channel in choosenChannels:
-            choosenChannels[channel] = str(channel)
+        choosenChannels = [channel.decode('utf-8') for channel in choosenChannels]
 
         output = func(uploadedConfig, choosenChannels)
 
