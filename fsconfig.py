@@ -135,6 +135,7 @@ def StreamSorting(config, choosenChannels):
     for stream in config['streams']:
         if stream['name'] in choosenChannels and request.forms.get(stream['name']) != '':
             stream['position'] = request.forms.get(stream['name'])
+            print(stream['position'])
 
     config['streams'].sort(key=lambda x: int(x.get('position')))
 
