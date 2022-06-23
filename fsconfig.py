@@ -130,13 +130,13 @@ def SourcePriority(config, choosenChannels):
 def StreamSorting(config, choosenChannels):
 
     if request.method == 'GET':
+        print(choosenChannels)
         return template('templates/stream_sorting_channels_form.tpl', names = choosenChannels), config
 
     for stream in config['streams']:
-        print(type(request.forms.get(stream['name'])))
         if stream['name'] in choosenChannels and request.forms.get(stream['name']) != '':
             stream['position'] = request.forms.get(stream['name'])
-            print(stream['position'])
+            print(config[stream]['position'])
 
     config['streams'].sort(key=lambda x: int(x.get('position')))
 
