@@ -5,8 +5,8 @@ import redis
 from redis.commands.json.path import Path
 from bottle import route, run, template, request, debug, static_file, error, default_app
 
-allowedIP = ['127.0.0.1', '62.90.52.94', '94.130.136.116', '185.180.103.78']
-menuLinks = {'main-menu' : 'MainMenu',
+allowed_IP = ['127.0.0.1', '62.90.52.94', '94.130.136.116', '185.180.103.78']
+menu_links = {'main-menu' : 'MainMenu',
              'choose-channels' : 'ChooseChannels',
              'dvr-settings' : 'DVRSettings',
              'source-priority' : 'SourcePriority',
@@ -14,19 +14,19 @@ menuLinks = {'main-menu' : 'MainMenu',
              'config-upload' : 'ConfigUpload',
              'config-download' : 'ConfigDownload'}
 
-redisClient = redis.Redis(host='localhost', port=6379, db=0)
+redis_сlient = redis.Redis(host='localhost', port=6379, db=0)
 
 def ConfigLoadUpdate(func):
     def Wrapper():
-        uploadedConfig = {}
+        uploaded_config = {}
 
-        uploadedConfig.update(redisClient.json().get('uploadedConfig', Path.root_path()))
-        choosenChannels = redisClient.lrange('choosenChannels', 0, -1)
-        choosenChannels = [channel.decode('utf-8') for channel in choosenChannels]
+        uploaded_config.update(redis_сlient.json().get('uploaded_config', Path.root_path()))
+        choosen_channels = redis_сlient.lrange('choosen_channels', 0, -1)
+        choosen_channels = [channel.decode('utf-8') for channel in choosen_channels]
 
-        output = func(uploadedConfig, choosenChannels)
+        output = func(uploaded_config, choosen_channels)
 
-        redisClient.json().set('uploadedConfig', Path.root_path(), output[1])
+        redis_сlient.json().set('uploaded_config', Path.root_path(), output[1])
         return output[0]
 
     return Wrapper
@@ -34,12 +34,12 @@ def ConfigLoadUpdate(func):
 @route('/<url>', method=['GET','POST'])
 def Router(url):
 
-    if request.environ.get('HTTP_X_FORWARDED_FOR') is not None and request.environ.get('HTTP_X_FORWARDED_FOR') not in allowedIP or request.environ.get('REMOTE_ADDR') not in allowedIP:
+    if request.environ.get('HTTP_X_FORWARDED_FOR') is not None and request.environ.get('HTTP_X_FORWARDED_FOR') not in allowed_IP or request.environ.get('REMOTE_ADDR') not in allowed_IP:
         print(request.environ.get('REMOTE_ADDR'))
         return(HTTPErrorHandling(403))
 
-    if url in menuLinks:
-        return(globals()[menuLinks[url]]())
+    if url in menu_links:
+        return(globals()[menu_links[url]]())
 
     return(HTTPErrorHandling(404))
 
@@ -59,80 +59,80 @@ def MainMenu():
 
 def ChooseChannels():
 
-    channelList = []
-    choosenChannels = []
+    channel_ist = []
+    choosen_channels = []
 
-    for stream in redisClient.json().get('uploadedConfig', Path('.streams')):
-            channelList.append(stream['name'])
+    for stream in redis_сlient.json().get('uploaded_config', Path('.streams')):
+            channel_ist.append(stream['name'])
 
     if request.method == 'GET':
-        redisClient.ltrim('choosenChannels', 1, 0)
-        return template('templates/choose_channels_form.tpl', names = channelList)
+        redis_сlient.ltrim('choosen_channels', 1, 0)
+        return template('templates/choose_channels_form.tpl', names = channel_ist)
 
-    for channel in channelList:
+    for channel in channel_ist:
         if request.forms.get(channel) == 'on':
-            redisClient.rpush('choosenChannels', channel)
-            choosenChannels.append(channel)
+            redis_сlient.rpush('choosen_channels', channel)
+            choosen_channels.append(channel)
             
-    return template('templates/choosen_channels.tpl', names = choosenChannels)
+    return template('templates/choosen_channels.tpl', names = choosen_channels)
 
 @ConfigLoadUpdate
-def DVRSettings(config, choosenChannels):
+def DVRSettings(config, choosen_channels):
 
     if request.method == 'GET':
         return template('templates/dvr_settings_form.tpl'), config
 
-    discSpaceLimitGb = int(request.forms.get('space_limit_gb')) * 1024 ** 3
-    discSpaceLimitPerc = int(request.forms.get('space_limit_perc'))
-    dvrLimit = int(request.forms.get('duration'))
-    dvrRoot = request.forms.get('path')
+    disc_space_limit_gb = int(request.forms.get('space_limit_gb')) * 1024 ** 3
+    disc_space_limit_perc = int(request.forms.get('space_limit_perc'))
+    dvr_limit = int(request.forms.get('duration'))
+    dvr_root = request.forms.get('path')
 
     for stream in config['streams']:
-        if stream['name'] in choosenChannels:
-            stream['dvr'] = {"disk_space" : discSpaceLimitGb,
-                             "disk_limit" : discSpaceLimitPerc,
-                             "disk_usage_limit" : discSpaceLimitPerc,
-                             "dvr_limit" : dvrLimit,
-                             "expiration" : dvrLimit,
-                             "root" : dvrRoot,
-                             "storage_limit" : discSpaceLimitGb}
-            if dvrLimit == 0:
+        if stream['name'] in choosen_channels:
+            stream['dvr'] = {"disk_space" : disc_space_limit_gb,
+                             "disk_limit" : disc_space_limit_perc,
+                             "disk_usage_limit" : disc_space_limit_perc,
+                             "dvr_limit" : dvr_limit,
+                             "expiration" : dvr_limit,
+                             "root" : dvr_root,
+                             "storage_limit" : disc_space_limit_gb}
+            if dvr_limit == 0:
                 del stream['dvr']
 
     return template('templates/dvr_complete.tpl'), config
 
 @ConfigLoadUpdate
-def SourcePriority(config, choosenChannels):
+def SourcePriority(config, choosen_channels):
 
     if request.method == 'GET':
         return template('templates/source_priority_form.tpl'), config
 
-    firstCondition = request.forms.get('firstCondition')
-    firstConditionPriority = request.forms.get('firstConditionPriority')
-    secondCondition = request.forms.get('secondCondition')
-    secondConditionPriority = request.forms.get('secondConditionPriority')
-    defaultPriority = request.forms.get('defaultPriority')
+    first_condition = request.forms.get('first_condition')
+    first_condition_priority = request.forms.get('first_condition_priority')
+    second_condition = request.forms.get('second_condition')
+    second_condition_priority = request.forms.get('second_condition_priority')
+    default_priority = request.forms.get('default_priority')
 
     for stream in config['streams']:
-        if stream['name'] in choosenChannels:
+        if stream['name'] in choosen_channels:
             for url in stream['inputs']:
-                if firstCondition in url['url'] and firstCondition != '':
-                    url['priority'] = firstConditionPriority
-                elif secondCondition in url['url'] and secondCondition != '':
-                    url['priority'] = secondConditionPriority
+                if first_condition in url['url'] and first_condition != '':
+                    url['priority'] = first_condition_priority
+                elif second_condition in url['url'] and second_condition != '':
+                    url['priority'] = second_condition_priority
                 else:
-                    url['priority'] = defaultPriority
+                    url['priority'] = default_priority
 
     return template('templates/source_priority_complete.tpl'), config
 
 @ConfigLoadUpdate
-def StreamSorting(config, choosenChannels):
+def StreamSorting(config, choosen_channels):
 
     if request.method == 'GET':
-        return template('templates/stream_sorting_channels_form.tpl', names = choosenChannels), config
+        return template('templates/stream_sorting_channels_form.tpl', names = choosen_channels), config
 
     for stream in config['streams']:
-        if stream['name'] in choosenChannels and request.forms.get(stream['name']) != '':
+        if stream['name'] in choosen_channels and request.forms.get(stream['name']) != '':
             stream['position'] = request.forms.get(stream['name'])
 
     config['streams'].sort(key=lambda x: int(x.get('position')))
@@ -144,14 +144,14 @@ def ConfigUpload():
     if request.method == 'GET':
         return template('templates/upload_file_form.tpl')
 
-    redisClient.json().set('uploadedConfig', Path.root_path(), json.load(request.files.get('config').file))
+    redis_сlient.json().set('uploaded_config', Path.root_path(), json.load(request.files.get('config').file))
 
     return template('templates/upload_complete.tpl')
 
 def ConfigDownload():
 
     with open('./output_config.json', 'w') as file:
-        json.dump(redisClient.json().get('uploadedConfig', Path.root_path()), file)
+        json.dump(redis_сlient.json().get('uploaded_config', Path.root_path()), file)
 
     return static_file('output_config.json', root='./', download=True)
 
