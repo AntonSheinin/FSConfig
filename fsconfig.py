@@ -3,6 +3,7 @@
 import json
 import secrets
 from random import random
+from ssl import SSLSession
 from urllib import response
 import redis
 from redis.commands.json.path import Path
@@ -20,16 +21,19 @@ menu_links = {'main-menu' : 'MainMenu',
 redis_сlient = redis.Redis(host='localhost', port=6379, db=0)
 
 def ConfigLoadUpdate(func):
-    def Wrapper():
+    def Wrapper(session):
+
+        uploaded_config_name = 'uploaded_config' + session
+        choosen_channels_name = 'choosen_channels' + session
         uploaded_config = {}
 
-        uploaded_config.update(redis_сlient.json().get('uploaded_config', Path.root_path()))
-        choosen_channels = redis_сlient.lrange('choosen_channels', 0, -1)
+        uploaded_config.update(redis_сlient.json().get(uploaded_config_name, Path.root_path()))
+        choosen_channels = redis_сlient.lrange(choosen_channels_name, 0, -1)
         choosen_channels = [channel.decode('utf-8') for channel in choosen_channels]
 
         output = func(uploaded_config, choosen_channels)
 
-        redis_сlient.json().set('uploaded_config', Path.root_path(), output[1])
+        redis_сlient.json().set(uploaded_config_name, Path.root_path(), output[1])
         return output[0]
 
     return Wrapper
@@ -44,10 +48,11 @@ def Router(url):
     session_id = request.get_cookie('sessionid')
     print(session_id)
     if session_id is None:
-        response.set_cookie('sessionid', secrets.token_urlsafe(8))
+        session_id = secrets.token_urlsafe(8)
+        response.set_cookie('sessionid', session_id)
 
     if url in menu_links:
-        return(globals()[menu_links[url]]())
+        return(globals()[menu_links[url]](session_id))
 
     return(HTTPErrorHandling(404))
 
@@ -65,24 +70,26 @@ def HTTPErrorHandling(code):
 def MainMenu():
     return template('templates/main_menu.tpl')
 
-def ChooseChannels():
+def ChooseChannels(session):
 
-    channel_ist = []
+    channel_list = []
     choosen_channels = []
+    uploaded_config_name = 'uploaded_config' + session
+    choosen_channels_name = 'choosen_channels' + session
 
-    for stream in redis_сlient.json().get('uploaded_config', Path('.streams')):
-            channel_ist.append(stream['name'])
+    for stream in redis_сlient.json().get(uploaded_config_name, Path('.streams')):
+            channel_list.append(stream['name'])
 
     if request.method == 'GET':
-        redis_сlient.ltrim('choosen_channels', 1, 0)
-        return template('templates/choose_channels_form.tpl', names = channel_ist)
+        redis_сlient.ltrim(choosen_channels_name, 1, 0)
+        return template('templates/choose_channels_form.tpl', names = channel_list)
 
-    for channel in channel_ist:
+    for channel in channel_list:
         if request.forms.get(channel) == 'on':
-            redis_сlient.rpush('choosen_channels', channel)
+            redis_сlient.rpush(choosen_channels_name, channel)
             choosen_channels.append(channel)
             
-    return template('templates/choosen_channels.tpl', names = choosen_channels)
+    return template('templates/choosen_channels.tpl', names = choosen_channels_name)
 
 @ConfigLoadUpdate
 def DVRSettings(config, choosen_channels):
@@ -147,19 +154,20 @@ def StreamSorting(config, choosen_channels):
 
     return template('templates/sorting_complete.tpl'), config
 
-def ConfigUpload():
+def ConfigUpload(session):
 
     if request.method == 'GET':
         return template('templates/upload_file_form.tpl')
 
-    redis_сlient.json().set('uploaded_config', Path.root_path(), json.load(request.files.get('config').file))
+    uploaded_config_name = 'uploaded_config' + session
+    redis_сlient.json().set(uploaded_config_name, Path.root_path(), json.load(request.files.get('config').file))
 
     return template('templates/upload_complete.tpl')
 
-def ConfigDownload():
+def ConfigDownload(session):
 
     with open('./output_config.json', 'w') as file:
-        json.dump(redis_сlient.json().get('uploaded_config', Path.root_path()), file)
+        json.dump(redis_сlient.json().get('uploaded_config'+session, Path.root_path()), file)
 
     return static_file('output_config.json', root='./', download=True)
 
