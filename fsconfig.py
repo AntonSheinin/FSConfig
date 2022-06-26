@@ -43,7 +43,7 @@ def Router(url):
 
     session_id = request.get_cookie('sessionid')
     print(session_id)
-    if session_id == "":
+    if session_id is None:
         response.set_cookie('sessionid', secrets.token_urlsafe(8))
 
     if url in menu_links:
