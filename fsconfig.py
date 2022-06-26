@@ -6,7 +6,7 @@ from random import random
 from urllib import response
 import redis
 from redis.commands.json.path import Path
-from bottle import route, run, template, request, debug, static_file, error, default_app
+from bottle import route, run, template, request, debug, static_file, error, default_app, response
 
 allowed_IP = ['127.0.0.1', '62.90.52.94', '94.130.136.116', '185.180.103.78']
 menu_links = {'main-menu' : 'MainMenu',
