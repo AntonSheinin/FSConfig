@@ -1,6 +1,9 @@
 #fsconfig.py - Webapp for Flussonic Streaming Server mutliple streams configedit
 
 import json
+import secrets
+from random import random
+from urllib import response
 import redis
 from redis.commands.json.path import Path
 from bottle import route, run, template, request, debug, static_file, error, default_app
@@ -34,9 +37,14 @@ def ConfigLoadUpdate(func):
 @route('/<url>', method=['GET','POST'])
 def Router(url):
 
-    if request.environ.get('HTTP_X_FORWARDED_FOR') is not None and request.environ.get('HTTP_X_FORWARDED_FOR') not in allowed_IP or request.environ.get('REMOTE_ADDR') not in allowed_IP:
+    if (request.environ.get('HTTP_X_FORWARDED_FOR') is not None and request.environ.get('HTTP_X_FORWARDED_FOR') not in allowed_IP) or request.environ.get('REMOTE_ADDR') not in allowed_IP:
         print(request.environ.get('REMOTE_ADDR'))
         return(HTTPErrorHandling(403))
+
+    session_id = request.get_cookie('sessionid')
+    print(session_id)
+    if session_id == "":
+        response.set_cookie('sessionid', secrets.token_urlsafe(8))
 
     if url in menu_links:
         return(globals()[menu_links[url]]())
