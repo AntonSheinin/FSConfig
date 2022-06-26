@@ -67,7 +67,7 @@ def HTTPErrorHandling(code):
     if code == 404:
         return('page doesnt exist')
 
-def MainMenu():
+def MainMenu(session):
     return template('templates/main_menu.tpl')
 
 def ChooseChannels(session):
