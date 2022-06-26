@@ -89,7 +89,7 @@ def ChooseChannels(session):
             redis_сlient.rpush(choosen_channels_name, channel)
             choosen_channels.append(channel)
             
-    return template('templates/choosen_channels.tpl', names = choosen_channels_name)
+    return template('templates/choosen_channels.tpl', names = choosen_channels)
 
 @ConfigLoadUpdate
 def DVRSettings(config, choosen_channels):
