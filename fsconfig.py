@@ -1,4 +1,4 @@
-#fsconfig.py - Webapp for Flussonic Streaming Server mutliple streams configedit
+#fsconfig.py - Webapp for Flussonic Streaming Server mutliple streams config edit
 
 import json
 import secrets
@@ -7,7 +7,7 @@ from ssl import SSLSession
 from urllib import response
 import redis
 from redis.commands.json.path import Path
-from bottle import route, run, template, request, debug, static_file, error, default_app, response
+from bottle import route, run, template, request, static_file, error, default_app, response
 
 allowed_IP = ['127.0.0.1', '62.90.52.94', '94.130.136.116', '185.180.103.78']
 menu_links = {'main-menu' : 'MainMenu',
@@ -23,17 +23,15 @@ redis_сlient = redis.Redis(host='localhost', port=6379, db=0)
 def ConfigLoadUpdate(func):
     def Wrapper(session):
 
-        uploaded_config_name = 'uploaded_config' + session
-        choosen_channels_name = 'choosen_channels' + session
         uploaded_config = {}
 
-        uploaded_config.update(redis_сlient.json().get(uploaded_config_name, Path.root_path()))
-        choosen_channels = redis_сlient.lrange(choosen_channels_name, 0, -1)
+        uploaded_config.update(redis_сlient.json().get('uploaded_config' + session, Path.root_path()))
+        choosen_channels = redis_сlient.lrange('choosen_channels' + session, 0, -1)
         choosen_channels = [channel.decode('utf-8') for channel in choosen_channels]
 
         output = func(uploaded_config, choosen_channels)
 
-        redis_сlient.json().set(uploaded_config_name, Path.root_path(), output[1])
+        redis_сlient.json().set('uploaded_config' + session, Path.root_path(), output[1])
         return output[0]
 
     return Wrapper
@@ -74,19 +72,17 @@ def ChooseChannels(session):
 
     channel_list = []
     choosen_channels = []
-    uploaded_config_name = 'uploaded_config' + session
-    choosen_channels_name = 'choosen_channels' + session
 
-    for stream in redis_сlient.json().get(uploaded_config_name, Path('.streams')):
+    for stream in redis_сlient.json().get('uploaded_config' + session, Path('.streams')):
             channel_list.append(stream['name'])
 
     if request.method == 'GET':
-        redis_сlient.ltrim(choosen_channels_name, 1, 0)
+        redis_сlient.ltrim('choosen_channels' + session, 1, 0)
         return template('templates/choose_channels_form.tpl', names = channel_list)
 
     for channel in channel_list:
         if request.forms.get(channel) == 'on':
-            redis_сlient.rpush(choosen_channels_name, channel)
+            redis_сlient.rpush('choosen_channels' + session, channel)
             choosen_channels.append(channel)
             
     return template('templates/choosen_channels.tpl', names = choosen_channels)
@@ -159,15 +155,14 @@ def ConfigUpload(session):
     if request.method == 'GET':
         return template('templates/upload_file_form.tpl')
 
-    uploaded_config_name = 'uploaded_config' + session
-    redis_сlient.json().set(uploaded_config_name, Path.root_path(), json.load(request.files.get('config').file))
+    redis_сlient.json().set('uploaded_config' + session, Path.root_path(), json.load(request.files.get('config').file))
 
     return template('templates/upload_complete.tpl')
 
 def ConfigDownload(session):
 
     with open('./output_config.json', 'w') as file:
-        json.dump(redis_сlient.json().get('uploaded_config'+session, Path.root_path()), file)
+        json.dump(redis_сlient.json().get('uploaded_config' + session, Path.root_path()), file)
 
     return static_file('output_config.json', root='./', download=True)
 
