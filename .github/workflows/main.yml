@@ -14,4 +14,4 @@ jobs:
         port: 22
         script: |
             cd ~/python/fsconfig
-            git pull fsconfig-github/master master
+            git pull fsconfig-github master
