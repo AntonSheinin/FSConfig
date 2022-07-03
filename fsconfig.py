@@ -23,10 +23,9 @@ menu_links = {'main-menu' : 'MainMenu',
 redis_сlient = redis.Redis(host='localhost', port=6379, db=0)
 
 def get_streams_via_api(session):
-    auth = HTTPBasicAuth('flussonic', '2V3kTTJ4b2AKW9Ls')
     api_method = 'streams'
     url = 'http://193.176.179.222:8085/flussonic/api/v3/'
-    r = requests.get(''.join((url, api_method)), auth)
+    r = requests.get(''.join((url, api_method)), auth = HTTPBasicAuth('flussonic', '2V3kTTJ4b2AKW9Ls'))
 
     print (r.json())
 
