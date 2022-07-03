@@ -16,18 +16,17 @@ menu_links = {'main-menu' : 'MainMenu',
              'dvr-settings' : 'DVRSettings',
              'source-priority' : 'SourcePriority',
              'stream-sorting' : 'StreamSorting',
-             'config-upload' : 'ConfigUpload',
+             'config-upload' : 'ConfigUploadApi',
              'config-download' : 'ConfigDownload',
              'get-streams' : 'get_streams_via_api'}
 
 redis_сlient = redis.Redis(host='localhost', port=6379, db=0)
 
-def get_streams_via_api(session):
-    api_method = 'streams'
+def api_call(api_method):
     url = 'http://193.176.179.222:8085/flussonic/api/v3/'
-    r = requests.get(''.join((url, api_method)), auth = HTTPBasicAuth('flussonic', '2V3kTTJ4b2AKW9Ls'))
+    response = requests.get(''.join((url, api_method)), auth = HTTPBasicAuth('flussonic', '2V3kTTJ4b2AKW9Ls'))
 
-    print (r.json())
+    return response.json()
 
 def ConfigLoadUpdate(func):
     def Wrapper(session):
@@ -158,6 +157,14 @@ def StreamSorting(config, choosen_channels):
     config['streams'].sort(key=lambda x: int(x.get('position')))
 
     return template('templates/sorting_complete.tpl'), config
+
+def ConfigUploadApi(session):
+
+    config = api_call('streams')
+
+    redis_сlient.json().set('api_uploaded_config' + session, Path.root_path(), config)
+
+    return template('templates/upload_complete.tpl')
 
 def ConfigUpload(session):
 
