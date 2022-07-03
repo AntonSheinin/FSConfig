@@ -41,9 +41,9 @@ body {
   <a href="/dvr-settings">DVR Settings</a>
   <a href="/source-priority">Source Priority</a>
   <a href="/stream-sorting">Stream Sorting</a>
-  <a href="/config-upload">Config Upload</a>
+  <a href="/config-upload-json">Config Upload JSON</a>
    <a href="/config-download">Config Download</a>
-   <a href="/get-streams">Get Streams</a>
+   <a href="/config-upload-api">Config Upload API</a>
 
 </div>
 

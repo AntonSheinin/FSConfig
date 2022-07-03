@@ -16,9 +16,9 @@ menu_links = {'main-menu' : 'MainMenu',
              'dvr-settings' : 'DVRSettings',
              'source-priority' : 'SourcePriority',
              'stream-sorting' : 'StreamSorting',
-             'config-upload' : 'ConfigUploadApi',
-             'config-download' : 'ConfigDownload',
-             'get-streams' : 'get_streams_via_api'}
+             'config-upload-json' : 'ConfigUploadJson',
+             'config-download' : 'ConfigDownloadJson',
+             'config-upload-api' : 'ConfigUploadApi'}
 
 redis_сlient = redis.Redis(host='localhost', port=6379, db=0)
 
@@ -162,7 +162,7 @@ def ConfigUploadApi(session):
 
     config = api_call('streams')
 
-    redis_сlient.json().set('api_uploaded_config' + session, Path.root_path(), config)
+    redis_сlient.json().set('uploaded_config' + session, Path.root_path(), config)
 
     return template('templates/upload_complete.tpl')
 
