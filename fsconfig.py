@@ -1,10 +1,10 @@
 #fsconfig.py - Webapp for Flussonic Streaming Server mutliple streams config edit
-#gitlab3
 
 import json
+import requests
+from requests.auth import HTTPBasicAuth
 import secrets
 from random import random
-from ssl import SSLSession
 from urllib import response
 import redis
 from redis.commands.json.path import Path
@@ -17,9 +17,17 @@ menu_links = {'main-menu' : 'MainMenu',
              'source-priority' : 'SourcePriority',
              'stream-sorting' : 'StreamSorting',
              'config-upload' : 'ConfigUpload',
-             'config-download' : 'ConfigDownload'}
+             'config-download' : 'ConfigDownload',
+             'get-streams' : 'get_streams_via_api'}
 
 redis_сlient = redis.Redis(host='localhost', port=6379, db=0)
+
+def get_streams_via_api():
+    auth = HTTPBasicAuth('flussonic', '2V3kTTJ4b2AKW9Ls')
+    api_method = 'streams'
+    url = 'http://193.176.179.222:8085/flussonic/api/v3/'.format(url)
+    r = requests.get(''.join(url, api_method), auth).json()
+    print (r)
 
 def ConfigLoadUpdate(func):
     def Wrapper(session):

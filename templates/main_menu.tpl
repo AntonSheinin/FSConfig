@@ -40,9 +40,11 @@ body {
   <a class="active" href="/choose-channels">Choose Channels</a>
   <a href="/dvr-settings">DVR Settings</a>
   <a href="/source-priority">Source Priority</a>
- <a href="/stream-sorting">Stream Sorting</a>
+  <a href="/stream-sorting">Stream Sorting</a>
   <a href="/config-upload">Config Upload</a>
    <a href="/config-download">Config Download</a>
+   <a href="/get-streams">Get Streams</a>
+
 </div>
 
 <br>
