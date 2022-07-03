@@ -17,7 +17,7 @@ menu_links = {'main-menu' : 'MainMenu',
              'source-priority' : 'SourcePriority',
              'stream-sorting' : 'StreamSorting',
              'config-upload-json' : 'ConfigUploadJson',
-             'config-download' : 'ConfigDownloadJson',
+             'config-download-json' : 'ConfigDownloadJson',
              'config-upload-api' : 'ConfigUploadApi'}
 
 redis_сlient = redis.Redis(host='localhost', port=6379, db=0)

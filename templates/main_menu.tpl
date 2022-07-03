@@ -42,7 +42,7 @@ body {
   <a href="/source-priority">Source Priority</a>
   <a href="/stream-sorting">Stream Sorting</a>
   <a href="/config-upload-json">Config Upload JSON</a>
-   <a href="/config-download">Config Download</a>
+   <a href="/config-download-json">Config Download JSON</a>
    <a href="/config-upload-api">Config Upload API</a>
 
 </div>
