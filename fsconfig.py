@@ -26,8 +26,9 @@ def get_streams_via_api(session):
     auth = HTTPBasicAuth('flussonic', '2V3kTTJ4b2AKW9Ls')
     api_method = 'streams'
     url = 'http://193.176.179.222:8085/flussonic/api/v3/'
-    r = requests.get(''.join((url, api_method)), auth).json()
-    print (r)
+    r = requests.get(''.join((url, api_method)), auth)
+
+    print (r.json())
 
 def ConfigLoadUpdate(func):
     def Wrapper(session):
