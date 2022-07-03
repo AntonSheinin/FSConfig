@@ -166,7 +166,7 @@ def ConfigUploadApi(session):
 
     return template('templates/upload_complete.tpl')
 
-def ConfigUpload(session):
+def ConfigUploadJSON(session):
 
     if request.method == 'GET':
         return template('templates/upload_file_form.tpl')
@@ -175,7 +175,7 @@ def ConfigUpload(session):
 
     return template('templates/upload_complete.tpl')
 
-def ConfigDownload(session):
+def ConfigDownloadJSON(session):
 
     with open('./output_config.json', 'w') as file:
         json.dump(redis_сlient.json().get('uploaded_config' + session, Path.root_path()), file)
