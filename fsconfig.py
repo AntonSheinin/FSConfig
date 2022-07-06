@@ -22,9 +22,10 @@ menu_links = {'main-menu' : 'MainMenu',
 
 redis_сlient = redis.Redis(host='localhost', port=6379, db=0)
 
-def api_call(api_method):
+def api_call(api_method, username, password):
+
     url = 'http://193.176.179.222:8085/flussonic/api/v3/'
-    response = requests.get(''.join((url, api_method)), auth = HTTPBasicAuth('flussonic', '2V3kTTJ4b2AKW9Ls'))
+    response = requests.get(''.join((url, api_method)), auth = HTTPBasicAuth(username, password))
 
     return response.json()
 
@@ -160,7 +161,13 @@ def StreamSorting(config, choosen_channels):
 
 def ConfigUploadApi(session):
 
-    config = api_call('streams')
+    if request.method == 'GET':
+        return template('templates/auth_form.tpl')
+
+    username = request.forms.get('username')
+    password = request.forms.get('password')
+
+    config = api_call('streams', username, password)
 
     redis_сlient.json().set('uploaded_config' + session, Path.root_path(), config)
 
