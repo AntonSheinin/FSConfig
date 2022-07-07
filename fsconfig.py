@@ -34,7 +34,7 @@ def api_call(query, request_method, json_payload, username, password):
         response = requests.get(''.join((url, query)), auth = HTTPBasicAuth(username, password))
 
     elif request_method == 'PUT':  
-        response = requests.put(''.join((url, query)), json = json_payload, auth = HTTPBasicAuth(username, password))
+        response = requests.put(''.join((url, query)), data = json.dumps(json_payload), auth = HTTPBasicAuth(username, password))
         print(response)
 
     else:
