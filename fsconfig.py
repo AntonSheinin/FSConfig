@@ -18,14 +18,25 @@ menu_links = {'main-menu' : 'MainMenu',
              'stream-sorting' : 'StreamSorting',
              'config-upload-json' : 'ConfigUploadJson',
              'config-download-json' : 'ConfigDownloadJson',
-             'config-upload-api' : 'ConfigUploadApi'}
+             'config-upload-api' : 'ConfigUploadApi',
+             'test-put-api' : 'TestPutApi'}
 
 redis_сlient = redis.Redis(host='localhost', port=6379, db=0)
 
-def api_call(api_method, username, password):
+def TestPutApi():
+    api_call('test', 'PUT', {'name' : 'test1'}, 'flussonic', '2V3kTTJ4b2AKW9Ls')
+
+def api_call(query, request_method, json_payload, username, password):
 
     url = 'http://193.176.179.222:8085/flussonic/api/v3/'
-    response = requests.get(''.join((url, api_method)), auth = HTTPBasicAuth(username, password))
+
+    if request_method == 'GET':
+        response = requests.get(''.join((url, query)), auth = HTTPBasicAuth(username, password))
+
+    elif request_method == 'PUT':  
+        response = requests.put(''.join((url, query)), json = json_payload, auth = HTTPBasicAuth(username, password))
+    else :
+        print('request method not supported')
 
     return response.json()
 
@@ -169,7 +180,9 @@ def ConfigUploadApi(session):
 
     stream_call = api_call('streams?limit=1', username, password)
 
-    config = api_call(''.join(('streams?limit=',str(stream_call['estimated_count']))), username, password)
+    config = api_call(''.join(('streams?limit=',str(stream_call['estimated_count'] + 10))), username, password)
+
+    TestPutApi()
 
     redis_сlient.json().set('uploaded_config' + session, Path.root_path(), config)
 
