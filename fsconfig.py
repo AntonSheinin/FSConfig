@@ -24,7 +24,7 @@ menu_links = {'main-menu' : 'MainMenu',
 redis_сlient = redis.Redis(host='localhost', port=6379, db=0)
 
 def TestPutApi():
-    payload = {"name" : "test1"}
+    payload = {"name": "test1"}
     api_call('streams/test', 'PUT', payload, 'flussonic', '2V3kTTJ4b2AKW9Ls')
 
 def api_call(query, request_method, json_payload, username, password):
@@ -183,9 +183,9 @@ def ConfigUploadApi(session):
 
     stream_call = api_call('streams?limit=1','GET', {}, username, password)
 
-    config = api_call(''.join(('streams?limit=', str(stream_call['estimated_count'] + 10))),'GET', {}, username, password)
-
     TestPutApi()
+
+    config = api_call(''.join(('streams?limit=', str(stream_call['estimated_count'] + 10))),'GET', {}, username, password)
 
     redis_сlient.json().set('uploaded_config' + session, Path.root_path(), config)
 
