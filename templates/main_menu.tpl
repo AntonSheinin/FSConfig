@@ -47,16 +47,6 @@ body {
 
 </div>
 
-<br>
-Step 1 : Download .json config file from Flussonic admin page.<br>
-Step 2 : Upload .json config file.<br>
-Step 3 : Choose channels for multiple settings editing.<br>
-Step 4 : Edit needed settings.<br>
-Step 5 : Dowload edited .json config file.<br>
-Step 6 : Upload edited .json config file to Flussonic admin page.<br>
------------------------------------------------------------------------------------
-<br>
-
 % if defined ('base') :
      {{!base}}
 
