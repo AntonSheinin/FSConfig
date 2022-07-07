@@ -178,9 +178,9 @@ def ConfigUploadApi(session):
     username = request.forms.get('username')
     password = request.forms.get('password')
 
-    stream_call = api_call('streams?limit=1', username, password)
+    stream_call = api_call('streams?limit=1','GET', {}, username, password)
 
-    config = api_call(''.join(('streams?limit=',str(stream_call['estimated_count'] + 10))), username, password)
+    config = api_call(''.join(('streams?limit=', str(stream_call['estimated_count'] + 10))),'GET', {}, username, password)
 
     TestPutApi()
 
