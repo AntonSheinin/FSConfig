@@ -24,7 +24,7 @@ menu_links = {'main-menu' : 'MainMenu',
 redis_сlient = redis.Redis(host='localhost', port=6379, db=0)
 
 def TestPutApi():
-    api_call('test', 'PUT', {'name' : 'test1'}, 'flussonic', '2V3kTTJ4b2AKW9Ls')
+    api_call('stream/test', 'PUT', {'name' : 'test1'}, 'flussonic', '2V3kTTJ4b2AKW9Ls')
 
 def api_call(query, request_method, json_payload, username, password):
 
