@@ -167,7 +167,7 @@ def ConfigUploadApi(session):
     username = request.forms.get('username')
     password = request.forms.get('password')
 
-    config = api_call('streams', username, password)
+    config = api_call('streams?limit=400', username, password)
 
     redis_сlient.json().set('uploaded_config' + session, Path.root_path(), config)
 

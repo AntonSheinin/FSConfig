@@ -47,6 +47,8 @@ body {
 
 </div>
 
+<br><br>
+
 % if defined ('base') :
      {{!base}}
 
