@@ -8,7 +8,7 @@
 
 <form action="/choose-channels" method="POST"">
            <table id="channels">
-	    % for name in names:
+	        % for name in names:
 		<tr>
         	   	          <td>
             			 <label for="{{name}}">{{name}}</label>
@@ -17,7 +17,7 @@
             			 <input type="checkbox" name="{{name}}" checked />
             		          </td>
 		</tr>
-    	     % end
+    	         % end
 	</table>
            <br>
        <input type='submit' value='Submit'>
@@ -27,19 +27,19 @@
   $(document).ready(function() {
     // Select all
     $("a[href='#select_all']").click(function() {
-      $("#" + $(this).attr('rel') + " input[type='checkbox']").prop('checked', true)
+      $("#" + $(this).prop('rel') + " input[type='checkbox']").prop('checked', true)
       return false;
     });
 
     // Select none
     $("a[href='#select_none']").click(function() {
-      $("#" + $(this).attr('rel') + " input[type='checkbox']").prop('checked', false);
+      $("#" + $(this).prop('rel') + " input[type='checkbox']").prop('checked', false);
       return false;
     });
 
     // Invert selection
     $("a[href='#invert_selection']").click(function() {
-      $("#" + $(this).attr('rel') + " input[type='checkbox']").each(function() {
+      $("#" + $(this).prop('rel') + " input[type='checkbox']").each(function() {
         $(this).prop('checked', !$(this).prop('checked'));
       });
       return false;
