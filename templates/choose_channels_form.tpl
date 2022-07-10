@@ -37,7 +37,7 @@
 
          $('#invert_selection').click(function() {
            $("#" + "channels" + " input[type='checkbox']").each(function() {
-              $(this).prop('checked', !$(this).prop('checked'));
+           $("#" + "channels" + " input[type='checkbox']").prop('checked', !$("#" + "channels" + " input[type='checkbox']").prop('checked'));
          });
          return false;
     });
