@@ -35,10 +35,9 @@
              return false;
           });
 
-         $('#invert_selection').click(function() {
+         $('#invert_selection').click(function(){
            $("#" + "channels" + " input[type='checkbox']").prop('checked', !$("#" + "channels" + " input[type='checkbox']").prop('checked'));
-         });
-         return false;
+           return false;
     });
   });
 </script>
