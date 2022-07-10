@@ -181,6 +181,7 @@ def ConfigUploadApi(session):
     password = request.forms.get('password')
 
     stream_call = api_call('streams?limit=1','GET', {}, username, password)
+    print(stream_call)
 
     #TestPutApi()
 
