@@ -10,7 +10,7 @@ import redis
 from redis.commands.json.path import Path
 from bottle import route, run, template, request, static_file, error, default_app, response
 
-allowed_IP = ['127.0.0.1', '62.90.52.94', '94.130.136.116', '185.180.103.78']
+allowed_IP = ['127.0.0.1', '62.90.52.94', '94.130.136.116']
 menu_links = {'main-menu' : 'MainMenu',
              'choose-channels' : 'ChooseChannels',
              'dvr-settings' : 'DVRSettings',
@@ -23,12 +23,12 @@ menu_links = {'main-menu' : 'MainMenu',
 
 redis_сlient = redis.Redis(host='localhost', port=6379, db=0)
 
-def TestPutApi():
-    api_call('streams/test', 'PUT', {"inputs": [{"$index": 1, "url": "hls://testurl1afterchange.com"}]}, 'flussonic', '2V3kTTJ4b2AKW9Ls')
+#def TestPutApi():
+#    api_call('test', 'PUT', {"inputs": [{"$index": 1, "url": "hls://testico.com"}]}, 'flussonic', '2V3kTTJ4b2AKW9Ls')
 
 def api_call(query, request_method, json_payload, username, password):
 
-    url = 'http://193.176.179.222:8085/flussonic/api/v3/'
+    url = 'http://193.176.179.222:8085/flussonic/api/v3/streams/'
 
     if request_method == 'GET':
         response = requests.get(''.join((url, query)), auth = HTTPBasicAuth(username, password))
@@ -182,7 +182,7 @@ def ConfigUploadApi(session):
 
     stream_call = api_call('streams?limit=1','GET', {}, username, password)
 
-    TestPutApi()
+    #TestPutApi()
 
     config = api_call(''.join(('streams?limit=', str(stream_call['estimated_count'] + 10))),'GET', {}, username, password)
 
