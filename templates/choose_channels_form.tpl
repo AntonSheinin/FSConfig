@@ -6,8 +6,8 @@
 
 <br><br>
 
-<form action="/choose-channels" method="POST"">
-           <table id="channels">
+<form id="channels" action="/choose-channels" method="POST"">
+           <table>
 	        % for name in names:
 		<tr>
         	   	          <td>
@@ -26,7 +26,7 @@
 <script type="text/javascript">
   $(function() {
           $('#select_all').click(function(){
-             $("#channels").find("input[type='checkbox']").prop('checked', true)
+             $("#channels input[type='checkbox']").prop('checked', true)
              return false;
           });
 
