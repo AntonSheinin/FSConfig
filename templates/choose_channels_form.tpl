@@ -30,7 +30,7 @@
              return false;
           });
 
-          $('#select_all').click(function(){
+          $('#select_none').click(function(){
              $("#" + "channels" + " input[type='checkbox']").prop('checked', false)
              return false;
           });
