@@ -4,7 +4,7 @@
 <a rel="channels" href="#select_none">Select None</a>
 <a rel="channels" href="#invert_selection">Invert Selection</a>
 
-<br>
+<br><br>
 
 <form action="/choose-channels" method="POST"">
            <table id="channels">
@@ -20,7 +20,7 @@
     	     % end
 	</table>
            <br>
-           <input type='submit' value='Submit'>
+       <input type='submit' value='Submit'>
 </form>
 
 <script type="text/javascript">
@@ -41,6 +41,7 @@
     $("a[href='#invert_selection']").click(function() {
       $("#" + $(this).attr('rel') + " input[type='checkbox']").each(function() {
         $(this).attr('checked', !$(this).attr('checked'));
+        $(this).attr('unchecked', !$(this).attr('checked'));
       });
       return false;
     });
