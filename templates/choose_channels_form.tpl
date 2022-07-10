@@ -26,7 +26,7 @@
 <script type="text/javascript">
   $(function() {
           $('#select_all').click(function(){
-             $('#channels input:checkbox').prop('checked', true)
+             $("#channels").find("input[type='checkbox']").prop('checked', true)
              return false;
           });
 
