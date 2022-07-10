@@ -2,7 +2,7 @@
 
 <button id="select_all" type="button" >Select All</button>
 <button id="select_none" type="button" >Select None</button>
-<button id="invert_none" type="button" >Invert selection</button>
+<button id="invert_selection" type="button" >Invert selection</button>
 
 <br><br>
 
