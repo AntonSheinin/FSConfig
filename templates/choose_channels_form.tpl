@@ -1,6 +1,6 @@
 % rebase('templates/main_menu.tpl')
 
-<button type="button" onclick="#select_all">Select All</button>
+<button type="button" onclick="window.location.href='#select_all';">Select All</button>
 
 <a rel="channels" href="#select_all">Select All</a>
 <a rel="channels" href="#select_none">Select None</a>
