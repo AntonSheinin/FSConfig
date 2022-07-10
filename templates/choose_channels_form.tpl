@@ -26,18 +26,20 @@
 <script type="text/javascript">
   $(function() {
           $('#select_all').click(function(){
-             $("#channels input[type='checkbox']").prop('checked', true)
+             $("#channels input[type='checkbox']").prop('checked', true);
              return false;
           });
 
           $('#select_none').click(function(){
-             $("#" + "channels" + " input[type='checkbox']").prop('checked', false)
+             $("#channels input[type='checkbox']").prop('checked', false);
              return false;
           });
 
          $('#invert_selection').click(function(){
-           $("#" + "channels" + " input[type='checkbox']").prop('checked', !$("#" + "channels" + " input[type='checkbox']").prop('checked'));
+           $("#channels input[type='checkbox']").each(function(){
+	$("#channels input[type='checkbox']").prop('checked', !$("#channels input[type='checkbox']").prop('checked'));
+            });
            return false;
-    });
+         });
   });
 </script>
