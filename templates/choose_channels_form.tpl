@@ -1,10 +1,10 @@
 % rebase('templates/main_menu.tpl')
 
 <button id="select_all" type="button" >Select All</button>
+<button id="select_none" type="button" >Select None</button>
+<button id="invert_none" type="button" >Invert selection</button>
 
-<a rel="channels" href="#select_all">Select All</a>
-<a rel="channels" href="#select_none">Select None</a>
-<a rel="channels" href="#invert_selection">Invert Selection</a>
+<br><br>
 
 <form action="/choose-channels" method="POST"">
            <table id="channels">
@@ -30,16 +30,16 @@
              return false;
           });
 
-    $("a[href='#select_none']").click(function() {
-      $("#" + $(this).prop('rel') + " input[type='checkbox']").prop('checked', false);
-      return false;
-    });
+          $('#select_all').click(function(){
+             $("#" + "channels" + " input[type='checkbox']").prop('checked', false)
+             return false;
+          });
 
-    $("a[href='#invert_selection']").click(function() {
-      $("#" + $(this).prop('rel') + " input[type='checkbox']").each(function() {
-        $(this).prop('checked', !$(this).prop('checked'));
-      });
-      return false;
+         $('#invert_selection').click(function() {
+           $("#" + "channels" + " input[type='checkbox']").each(function() {
+              $(this).prop('checked', !$(this).prop('checked'));
+         });
+         return false;
     });
   });
 </script>
