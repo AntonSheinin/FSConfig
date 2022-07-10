@@ -4,10 +4,11 @@
 <a rel="channels" href="#select_none">Select None</a>
 <a rel="channels" href="#invert_selection">Invert Selection</a>
 
+<br>
+
 <form action="/choose-channels" method="POST"">
-           <table>
-	<fieldset id="channels">
-	      % for name in names:
+           <table id="channels">
+	    % for name in names:
 		<tr>
         	   	          <td>
             			 <label for="{{name}}">{{name}}</label>
@@ -17,8 +18,7 @@
             		          </td>
 		</tr>
     	     % end
-	</fieldset>
-           </table>
+	</table>
            <br>
            <input type='submit' value='Submit'>
 </form>
