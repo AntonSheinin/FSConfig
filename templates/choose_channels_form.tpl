@@ -2,13 +2,9 @@
 
 <button type="button" onclick="#select_all">Select All</button>
 
-<br><br>
-
 <a rel="channels" href="#select_all">Select All</a>
 <a rel="channels" href="#select_none">Select None</a>
 <a rel="channels" href="#invert_selection">Invert Selection</a>
-
-<br><br>
 
 <form action="/choose-channels" method="POST"">
            <table id="channels">
