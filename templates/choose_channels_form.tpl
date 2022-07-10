@@ -1,6 +1,6 @@
 % rebase('templates/main_menu.tpl')
 
-<button type="button" onclick="window.location.href='#select_all';">Select All</button>
+<button type="button" onclick="$("#" + $(this).prop('rel') + " input[type='checkbox']").prop('checked', true)">Select All</button>
 
 <a rel="channels" href="#select_all">Select All</a>
 <a rel="channels" href="#select_none">Select None</a>
@@ -24,20 +24,17 @@
 </form>
 
 <script type="text/javascript">
-  $(document).ready(function() {
-    // Select all
+  $(function() {
     $("a[href='#select_all']").click(function() {
       $("#" + $(this).prop('rel') + " input[type='checkbox']").prop('checked', true)
       return false;
     });
 
-    // Select none
     $("a[href='#select_none']").click(function() {
       $("#" + $(this).prop('rel') + " input[type='checkbox']").prop('checked', false);
       return false;
     });
 
-    // Invert selection
     $("a[href='#invert_selection']").click(function() {
       $("#" + $(this).prop('rel') + " input[type='checkbox']").each(function() {
         $(this).prop('checked', !$(this).prop('checked'));
