@@ -27,21 +27,20 @@
   $(document).ready(function() {
     // Select all
     $("a[href='#select_all']").click(function() {
-      $("#" + $(this).attr('rel') + " input[type='checkbox']").attr('checked', true);
+      $("#" + $(this).attr('rel') + " input[type='checkbox']").prop('checked', true)
       return false;
     });
 
     // Select none
     $("a[href='#select_none']").click(function() {
-      $("#" + $(this).attr('rel') + " input[type='checkbox']").attr('checked', false);
+      $("#" + $(this).attr('rel') + " input[type='checkbox']").prop('checked', false);
       return false;
     });
 
     // Invert selection
     $("a[href='#invert_selection']").click(function() {
       $("#" + $(this).attr('rel') + " input[type='checkbox']").each(function() {
-        $(this).attr('checked', !$(this).attr('checked'));
-        $(this).attr('unchecked', !$(this).attr('checked'));
+        $(this).prop('checked', !$(this).prop('checked'));
       });
       return false;
     });
