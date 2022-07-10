@@ -1,6 +1,6 @@
 % rebase('templates/main_menu.tpl')
 
-<button type="button" onclick="$("#" + $(this).prop('rel') + " input[type='checkbox']").prop('checked', true)">Select All</button>
+<button id="select_all" type="button" >Select All</button>
 
 <a rel="channels" href="#select_all">Select All</a>
 <a rel="channels" href="#select_none">Select None</a>
@@ -25,10 +25,10 @@
 
 <script type="text/javascript">
   $(function() {
-    $("a[href='#select_all']").click(function() {
-      $("#" + $(this).prop('rel') + " input[type='checkbox']").prop('checked', true)
-      return false;
-    });
+          $('#select_all').click(function(){
+             $("#" + "channels" + " input[type='checkbox']").prop('checked', true)
+             return false;
+          });
 
     $("a[href='#select_none']").click(function() {
       $("#" + $(this).prop('rel') + " input[type='checkbox']").prop('checked', false);
