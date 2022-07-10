@@ -36,8 +36,8 @@
           });
 
          $('#invert_selection').click(function(){
-           $("#channels input[type='checkbox']").each(function(){
-	$("#channels input[type='checkbox']").prop('checked', !$("#channels input[type='checkbox']").prop('checked'));
+           $("#channels input[type='checkbox']").each(function(element){
+	$(this).prop('checked', !$(this).prop('checked'));
             });
            return false;
          });
