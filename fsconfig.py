@@ -179,15 +179,12 @@ def ConfigUploadApi(session):
     username = request.forms.get('username')
     password = request.forms.get('password')
 
-    config = redis_client.json().get('uploaded_config' + session, Path('.streams'))
-
-    redis_client.json().set('config' + session, Path.root_path(), config)
-    
     choosen_channels = redis_client.lrange('choosen_channels' + session, 0, -1)
     choosen_channels = [channel.decode('utf-8') for channel in choosen_channels]
 
     for channel in choosen_channels:
-        response = api_call(''.join(('streams/', channel)), 'PUT', config['streams'][channel], username, password)
+        config = redis_client.json().get('uploaded_config' + session, Path(''.join(('.streams.', channel))))
+        response = api_call(''.join(('streams/', channel)), 'PUT', config, username, password)
         print(response.status_code)
 
 def ConfigDownloadApi(session):
