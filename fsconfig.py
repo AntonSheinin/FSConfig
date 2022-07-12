@@ -172,7 +172,7 @@ def StreamSorting(config, choosen_channels):
 def ConfigUploadApi(session):
 
     if request.method == 'GET':
-        return template('templates/auth_form.tpl')
+        return template('templates/auth_form_upload.tpl')
 
     config = {}
 
