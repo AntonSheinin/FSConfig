@@ -184,7 +184,7 @@ def ConfigUploadApi(session):
     choosen_channels = [channel.decode('utf-8') for channel in choosen_channels]
 
     for channel in choosen_channels:
-        response = api_call(''.join(('streams/', channel)), 'PUT', config[channel], username, password)
+        response = api_call(''.join(('streams/', channel)), 'PUT', config['streams'][channel], username, password)
         print(response.status_code)
 
 def ConfigDownloadApi(session):
