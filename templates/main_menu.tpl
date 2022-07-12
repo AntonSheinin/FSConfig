@@ -2,8 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
-
+<script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
 
 <style>
 body {
@@ -31,8 +30,8 @@ body {
 }
 
 .topnav a.active {
-  background-color: #04AA6D;
-  color: white;
+  background-color: #ffa500;
+  color: black;
 }
 </style>
 </head>
@@ -46,7 +45,7 @@ body {
   <a href="/config-upload-json">Config Upload JSON</a>
    <a href="/config-download-json">Config Download JSON</a>
    <a href="/config-upload-api">Config Upload API</a>
-
+   <a href="/config-download-api">Config Download API</a>
 </div>
 
 <br><br>

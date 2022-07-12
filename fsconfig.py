@@ -19,12 +19,9 @@ menu_links = {'main-menu' : 'MainMenu',
              'config-upload-json' : 'ConfigUploadJson',
              'config-download-json' : 'ConfigDownloadJson',
              'config-upload-api' : 'ConfigUploadApi',
-             'test-put-api' : 'TestPutApi'}
+             'config-download-api' : 'ConfigDownloadApi'}
 
-redis_сlient = redis.Redis(host='localhost', port=6379, db=0)
-
-#def TestPutApi():
-#    api_call('test', 'PUT', {"inputs": [{"$index": 1, "url": "hls://testico.com"}]}, 'flussonic', '2V3kTTJ4b2AKW9Ls')
+redis_client = redis.Redis(host='localhost', port=6379, db=0)
 
 def api_call(query, request_method, json_payload, username, password):
 
@@ -35,7 +32,7 @@ def api_call(query, request_method, json_payload, username, password):
 
     elif request_method == 'PUT':  
         response = requests.put(''.join((url, query)), json = json_payload, auth = HTTPBasicAuth(username, password))
-        print(response.json())
+        print(response.status_code)
 
     else:
         print('request method not supported')
@@ -47,13 +44,13 @@ def ConfigLoadUpdate(func):
 
         uploaded_config = {}
 
-        uploaded_config.update(redis_сlient.json().get('uploaded_config' + session, Path.root_path()))
-        choosen_channels = redis_сlient.lrange('choosen_channels' + session, 0, -1)
+        uploaded_config.update(redis_client.json().get('uploaded_config' + session, Path.root_path()))
+        choosen_channels = redis_client.lrange('choosen_channels' + session, 0, -1)
         choosen_channels = [channel.decode('utf-8') for channel in choosen_channels]
 
         output = func(uploaded_config, choosen_channels)
 
-        redis_сlient.json().set('uploaded_config' + session, Path.root_path(), output[1])
+        redis_client.json().set('uploaded_config' + session, Path.root_path(), output[1])
         return output[0]
 
     return Wrapper
@@ -95,16 +92,16 @@ def ChooseChannels(session):
     channel_list = []
     choosen_channels = []
 
-    for stream in redis_сlient.json().get('uploaded_config' + session, Path('.streams')):
+    for stream in redis_client.json().get('uploaded_config' + session, Path('.streams')):
             channel_list.append(stream['name'])
 
     if request.method == 'GET':
-        redis_сlient.ltrim('choosen_channels' + session, 1, 0)
+        redis_client.ltrim('choosen_channels' + session, 1, 0)
         return template('templates/choose_channels_form.tpl', names = channel_list)
 
     for channel in channel_list:
         if request.forms.get(channel) == 'on':
-            redis_сlient.rpush('choosen_channels' + session, channel)
+            redis_client.rpush('choosen_channels' + session, channel)
             choosen_channels.append(channel)
             
     return template('templates/choosen_channels.tpl', names = choosen_channels)
@@ -177,16 +174,32 @@ def ConfigUploadApi(session):
     if request.method == 'GET':
         return template('templates/auth_form.tpl')
 
+    config = {}
+
+    username = request.forms.get('username')
+    password = request.forms.get('password')
+
+    config.update(redis_client.json().get('uploaded_config' + session, Path('.streams')))
+    choosen_channels = redis_client.lrange('choosen_channels' + session, 0, -1)
+    choosen_channels = [channel.decode('utf-8') for channel in choosen_channels]
+
+    for channel in choosen_channels:
+        response = api_call(''.join(('streams/', channel)), 'PUT', config[channel], username, password)
+        print(response.status_code)
+
+def ConfigDownloadApi(session):
+
+    if request.method == 'GET':
+        return template('templates/auth_form.tpl')
+
     username = request.forms.get('username')
     password = request.forms.get('password')
 
     stream_call = api_call('streams?limit=1','GET', {}, username, password)
 
-    #TestPutApi()
-
     config = api_call(''.join(('streams?limit=', str(stream_call['estimated_count'] + 10))),'GET', {}, username, password)
 
-    redis_сlient.json().set('uploaded_config' + session, Path.root_path(), config)
+    redis_client.json().set('uploaded_config' + session, Path.root_path(), config)
 
     return template('templates/upload_complete.tpl')
 
@@ -195,14 +208,14 @@ def ConfigUploadJson(session):
     if request.method == 'GET':
         return template('templates/upload_file_form.tpl')
 
-    redis_сlient.json().set('uploaded_config' + session, Path.root_path(), json.load(request.files.get('config').file))
+    redis_client.json().set('uploaded_config' + session, Path.root_path(), json.load(request.files.get('config').file))
 
     return template('templates/upload_complete.tpl')
 
 def ConfigDownloadJson(session):
 
     with open('./output_config.json', 'w') as file:
-        json.dump(redis_сlient.json().get('uploaded_config' + session, Path.root_path()), file)
+        json.dump(redis_client.json().get('uploaded_config' + session, Path.root_path()), file)
 
     return static_file('output_config.json', root='./', download=True)
 
