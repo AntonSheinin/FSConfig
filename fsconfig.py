@@ -190,7 +190,7 @@ def ConfigUploadApi(session):
 def ConfigDownloadApi(session):
 
     if request.method == 'GET':
-        return template('templates/auth_form.tpl')
+        return template('templates/auth_form_download.tpl')
 
     username = request.forms.get('username')
     password = request.forms.get('password')
