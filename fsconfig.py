@@ -180,6 +180,7 @@ def ConfigUploadApi(session):
     password = request.forms.get('password')
 
     config = redis_client.json().get('uploaded_config' + session, Path('.streams'))
+    print(config)
     choosen_channels = redis_client.lrange('choosen_channels' + session, 0, -1)
     choosen_channels = [channel.decode('utf-8') for channel in choosen_channels]
 
