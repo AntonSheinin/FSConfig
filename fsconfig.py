@@ -91,6 +91,7 @@ def choose_channels(session):
 
     channel_list = []
     choosen_channels = []
+    changed_channels = []
 
     for stream in redis_client.json().get('uploaded_config' + session, Path('.streams')):
             channel_list.append(stream['name'])
@@ -104,6 +105,15 @@ def choose_channels(session):
             choosen_channels.append(channel)
 
     redis_client.rpush('choosen_channels' + session, *choosen_channels)
+    
+    changed_channels = redis_client.lrange('changed_channels' + session, 0, -1)
+    changed_channels = [channel.decode('utf-8') for channel in changed_channels]
+
+    for channel in choosen_channels:
+        if channel not in changed_channels:
+            redis_client.rpush('changed_channels' + session, channel) 
+
+    redis_client.rpush('choosen_channels' + session, *choosen_channels) 
                         
     return template('templates/choosen_channels.tpl', names = choosen_channels)
 
