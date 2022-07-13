@@ -112,9 +112,7 @@ def choose_channels(session):
     for channel in choosen_channels:
         if channel not in changed_channels:
             redis_client.rpush('changed_channels' + session, channel) 
-
-    redis_client.rpush('choosen_channels' + session, *choosen_channels) 
-                        
+                      
     return template('templates/choosen_channels.tpl', names = choosen_channels)
 
 @config_load_update
