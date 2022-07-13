@@ -101,10 +101,10 @@ def choose_channels(session):
 
     for channel in channel_list:
         if request.forms.get(channel) == 'on':
-            redis_client.rpush('choosen_channels' + session, channel)
             choosen_channels.append(channel)
-            print(choosen_channels)
-            
+
+    redis_client.rpush('choosen_channels' + session, choosen_channels)
+                        
     return template('templates/choosen_channels.tpl', names = choosen_channels)
 
 @config_load_update
