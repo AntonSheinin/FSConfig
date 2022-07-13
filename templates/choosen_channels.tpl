@@ -1,6 +1,6 @@
 % rebase('templates/main_menu.tpl')
 
-          % for streamName in names:
-          	{{streamName}}
+          % for stream_name in names:
+          	{{stream_name}}
 	<br />	
           % end

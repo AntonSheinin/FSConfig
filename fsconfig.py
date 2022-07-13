@@ -11,15 +11,15 @@ from redis.commands.json.path import Path
 from bottle import route, run, template, request, static_file, error, default_app, response
 
 allowed_IP = ['127.0.0.1', '62.90.52.94', '94.130.136.116']
-menu_links = {'main-menu' : 'MainMenu',
-             'choose-channels' : 'ChooseChannels',
-             'dvr-settings' : 'DVRSettings',
-             'source-priority' : 'SourcePriority',
-             'stream-sorting' : 'StreamSorting',
-             'config-upload-json' : 'ConfigUploadJson',
-             'config-download-json' : 'ConfigDownloadJson',
-             'config-upload-api' : 'ConfigUploadApi',
-             'config-download-api' : 'ConfigDownloadApi'}
+menu_links = {'main-menu' : 'main_menu',
+             'choose-channels' : 'choose_channels',
+             'dvr-settings' : 'dvr_settings',
+             'source-priority' : 'source_priority',
+             'stream-sorting' : 'stream_sorting',
+             'config-load-json' : 'load_config_file_json',
+             'config-download-json' : 'download_config_file_json',
+             'config-upload-api' : 'config_upload_to_server_api',
+             'config-load-api' : 'config_load_from_server_api'}
 
 redis_client = redis.Redis(host='localhost', port=6379, db=0)
 
@@ -39,8 +39,8 @@ def api_call(query, request_method, json_payload, username, password):
 
     return response.json()
 
-def ConfigLoadUpdate(func):
-    def Wrapper(session):
+def config_load_update(func):
+    def wrapper(session):
 
         uploaded_config = {}
 
@@ -53,14 +53,14 @@ def ConfigLoadUpdate(func):
         redis_client.json().set('uploaded_config' + session, Path.root_path(), output[1])
         return output[0]
 
-    return Wrapper
+    return wrapper
 
 @route('/<url>', method=['GET','POST'])
-def Router(url):
+def router(url):
 
     if (request.environ.get('HTTP_X_FORWARDED_FOR') is not None and request.environ.get('HTTP_X_FORWARDED_FOR') not in allowed_IP) or request.environ.get('REMOTE_ADDR') not in allowed_IP:
         print(request.environ.get('REMOTE_ADDR'))
-        return(HTTPErrorHandling(403))
+        return(http_error_handling(403))
 
     session_id = request.get_cookie('sessionid')
     print(session_id)
@@ -71,23 +71,23 @@ def Router(url):
     if url in menu_links:
         return(globals()[menu_links[url]](session_id))
 
-    return(HTTPErrorHandling(404))
+    return(http_error_handling(404))
 
 @route('/')
-def RouterWrapper():
-        return Router('main-menu')
+def router_wrapper():
+        return router('main-menu')
 
-def HTTPErrorHandling(code):
+def http_error_handling(code):
 
     if code == 403:
         return('access denied')
     if code == 404:
         return('page doesnt exist')
 
-def MainMenu(session):
+def main_menu(session):
     return template('templates/main_menu.tpl')
 
-def ChooseChannels(session):
+def choose_channels(session):
 
     channel_list = []
     choosen_channels = []
@@ -106,8 +106,8 @@ def ChooseChannels(session):
             
     return template('templates/choosen_channels.tpl', names = choosen_channels)
 
-@ConfigLoadUpdate
-def DVRSettings(config, choosen_channels):
+@config_load_update
+def dvr_settings(config, choosen_channels):
 
     if request.method == 'GET':
         return template('templates/dvr_settings_form.tpl'), config
@@ -131,8 +131,8 @@ def DVRSettings(config, choosen_channels):
 
     return template('templates/dvr_complete.tpl'), config
 
-@ConfigLoadUpdate
-def SourcePriority(config, choosen_channels):
+@config_load_update
+def source_priority(config, choosen_channels):
 
     if request.method == 'GET':
         return template('templates/source_priority_form.tpl'), config
@@ -155,8 +155,8 @@ def SourcePriority(config, choosen_channels):
 
     return template('templates/source_priority_complete.tpl'), config
 
-@ConfigLoadUpdate
-def StreamSorting(config, choosen_channels):
+@config_load_update
+def stream_sorting(config, choosen_channels):
 
     if request.method == 'GET':
         return template('templates/stream_sorting_channels_form.tpl', names = choosen_channels), config
@@ -169,7 +169,7 @@ def StreamSorting(config, choosen_channels):
 
     return template('templates/sorting_complete.tpl'), config
 
-def ConfigUploadApi(session):
+def config_upload_to_server_api(session):
 
     if request.method == 'GET':
         return template('templates/auth_form_upload.tpl')
@@ -183,11 +183,11 @@ def ConfigUploadApi(session):
     choosen_channels = [channel.decode('utf-8') for channel in choosen_channels]
 
     for channel in choosen_channels:
-        config = redis_client.json().get('uploaded_config' + session, Path(''.join(('.streams.', channel))))
+        config = redis_client.json().get('uploaded_config' + session, Path(''.join(('.streams.name[', channel,']'))))
         response = api_call(''.join(('streams/', channel)), 'PUT', config, username, password)
         print(response.status_code)
 
-def ConfigDownloadApi(session):
+def config_load_from_server_api(session):
 
     if request.method == 'GET':
         return template('templates/auth_form_download.tpl')
@@ -203,7 +203,7 @@ def ConfigDownloadApi(session):
 
     return template('templates/upload_complete.tpl')
 
-def ConfigUploadJson(session):
+def load_config_file_json(session):
 
     if request.method == 'GET':
         return template('templates/upload_file_form.tpl')
@@ -212,7 +212,7 @@ def ConfigUploadJson(session):
 
     return template('templates/upload_complete.tpl')
 
-def ConfigDownloadJson(session):
+def download_config_file_json(session):
 
     with open('./output_config.json', 'w') as file:
         json.dump(redis_client.json().get('uploaded_config' + session, Path.root_path()), file)

@@ -2,7 +2,7 @@
 
 <p> <br /> </p>
 
-          % for streamName in names:
-          	{{names[streamName]}}
+          % for stream_name in names:
+          	{{names[stream_name]}}
 	<br />	
           % end

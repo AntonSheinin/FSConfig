@@ -42,10 +42,10 @@ body {
   <a href="/dvr-settings">DVR Settings</a>
   <a href="/source-priority">Source Priority</a>
   <a href="/stream-sorting">Stream Sorting</a>
-  <a href="/config-upload-json">Config Upload JSON</a>
-   <a href="/config-download-json">Config Download JSON</a>
-   <a href="/config-upload-api">Config Upload API</a>
-   <a href="/config-download-api">Config Download API</a>
+  <a href="/config-load-json">Load Config File</a>
+   <a href="/config-download-json">Download Config File</a>
+   <a href="/config-upload-api">Upload Config to Server</a>
+   <a href="/config-load-api">Load Config from Server</a>
 </div>
 
 <br><br>
