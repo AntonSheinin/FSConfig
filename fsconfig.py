@@ -103,7 +103,7 @@ def choose_channels(session):
         if request.forms.get(channel) == 'on':
             choosen_channels.append(channel)
 
-    redis_client.rpush('choosen_channels' + session, choosen_channels)
+    redis_client.rpush('choosen_channels' + session, *choosen_channels)
                         
     return template('templates/choosen_channels.tpl', names = choosen_channels)
 
