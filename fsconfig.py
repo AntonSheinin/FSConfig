@@ -194,6 +194,7 @@ def config_upload_to_server_api(session):
     for stream in redis_client.json().get('uploaded_config' + session, Path('.streams')):
         if stream['name'] in changed_channels:
             response = requests.put(''.join((url, stream['name'])), json = stream, auth = HTTPBasicAuth(username, password))
+            print(''.join((url, stream['name'])))
             print(response.status_code)
     #       api_call(''.join(('streams/', stream['name'])), 'PUT', stream, username, password)
 
