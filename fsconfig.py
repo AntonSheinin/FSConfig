@@ -33,7 +33,6 @@ def api_call(query, request_method, json_payload, username, password):
 
     elif request_method == 'PUT':  
         response = requests.put(''.join((url, query)), json = json_payload, auth = HTTPBasicAuth(username, password))
-        print(response.status_code)
 
     else:
         print('request method not supported')
