@@ -27,7 +27,7 @@ def api_call(query, request_method, json_payload, username, password):
 
     url = 'http://193.176.179.222:8085/flussonic/api/v3/'
 
-    print(url + query)
+    print(json_payload)
     pass
 
     if request_method == 'GET':
