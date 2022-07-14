@@ -192,7 +192,7 @@ def config_upload_to_server_api(session):
     changed_channels = redis_client.lrange('changed_channels' + session, 0, -1)
     changed_channels = [channel.decode('utf-8') for channel in changed_channels]
 
-    api_call(''.join(('streams/', 'test')), 'PUT', {"title" : "titlechangetest140722"}, username, password)
+    api_call(''.join(('streams/', 'test')), 'PUT', {"position" : 0}, username, password)
     #for stream in redis_client.json().get('uploaded_config' + session, Path('.streams')):
     #    if stream['name'] in changed_channels:
     #        api_call(''.join(('streams/', stream['name'])), 'PUT', stream, username, password)
