@@ -29,7 +29,6 @@ def api_call(query, request_method, json_payload, username, password):
 
     if request_method == 'GET':
         response = requests.get(''.join((url, query)), auth = HTTPBasicAuth(username, password))
-        print(response.status_code)
 
     elif request_method == 'PUT':  
         response = requests.put(''.join((url, query)), json = json_payload, auth = HTTPBasicAuth(username, password))
@@ -181,6 +180,7 @@ def stream_sorting(config, choosen_channels):
 def config_upload_to_server_api(session):
 
     changed_channels = []
+    url = 'http://193.176.179.222:8085/flussonic/api/v3/'
 
     if request.method == 'GET':
         return template('templates/auth_form_upload.tpl')
@@ -193,7 +193,9 @@ def config_upload_to_server_api(session):
 
     for stream in redis_client.json().get('uploaded_config' + session, Path('.streams')):
         if stream['name'] in changed_channels:
-            api_call(''.join(('streams/', stream['name'])), 'PUT', stream, username, password)
+            response = requests.put(''.join((url, stream['name'])), json = stream, auth = HTTPBasicAuth(username, password))
+            print(response.status_code)
+    #       api_call(''.join(('streams/', stream['name'])), 'PUT', stream, username, password)
 
     redis_client.ltrim('changed_channels' + session, 1, 0)
 
