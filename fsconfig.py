@@ -112,7 +112,7 @@ def choose_channels(session):
     for channel in choosen_channels:
         if channel not in changed_channels:
             redis_client.rpush('changed_channels' + session, channel) 
-                      
+
     return template('templates/choosen_channels.tpl', names = choosen_channels)
 
 @config_load_update
@@ -180,21 +180,23 @@ def stream_sorting(config, choosen_channels):
 
 def config_upload_to_server_api(session):
 
+    changed_channels = []
+
     if request.method == 'GET':
         return template('templates/auth_form_upload.tpl')
-
-    config = {}
 
     username = request.forms.get('username')
     password = request.forms.get('password')
 
-    choosen_channels = redis_client.lrange('choosen_channels' + session, 0, -1)
-    choosen_channels = [channel.decode('utf-8') for channel in choosen_channels]
+    changed_channels = redis_client.lrange('changed_channels' + session, 0, -1)
+    changed_channels = [channel.decode('utf-8') for channel in changed_channels]
 
-    for channel in choosen_channels:
-        config = redis_client.json().get('uploaded_config' + session, Path(''.join(('.streams.name[', channel,']'))))
-        response = api_call(''.join(('streams/', channel)), 'PUT', config, username, password)
-        print(response.status_code)
+    for stream in redis_client.json().get('uploaded_config' + session, Path('.streams')):
+        if stream['name'] in changed_channels:
+            response = api_call(''.join(('streams/', stream['name'])), 'PUT', stream, username, password)
+            print(response.status_code)
+
+    redis_client.ltrim('changed_channels' + session, 1, 0)
 
 def config_load_from_server_api(session):
 
