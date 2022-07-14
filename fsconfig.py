@@ -180,7 +180,7 @@ def stream_sorting(config, choosen_channels):
 def config_upload_to_server_api(session):
 
     changed_channels = []
-    url = 'http://193.176.179.222:8085/flussonic/api/v3/streams'
+    url = 'http://193.176.179.222:8085/flussonic/api/v3/streams/'
 
     if request.method == 'GET':
         return template('templates/auth_form_upload.tpl')
