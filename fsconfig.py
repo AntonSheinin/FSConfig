@@ -27,11 +27,9 @@ def api_call(query, request_method, json_payload, username, password):
 
     url = 'http://193.176.179.222:8085/flussonic/api/v3/'
 
-    print(json_payload)
-    pass
-
     if request_method == 'GET':
         response = requests.get(''.join((url, query)), auth = HTTPBasicAuth(username, password))
+        print(response.status_code)
 
     elif request_method == 'PUT':  
         response = requests.put(''.join((url, query)), json = json_payload, auth = HTTPBasicAuth(username, password))
