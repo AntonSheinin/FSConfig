@@ -131,7 +131,7 @@ def dvr_settings(config, choosen_channels, session):
             if dvr_limit == 0:
                 del stream['dvr']
 
-            redis_client.json.arrappend('changed_channels' + session, Path.root_path(), {stream['name'] : 'dvr'})
+            redis_client.json().arrappend('changed_channels' + session, Path.root_path(), {stream['name'] : 'dvr'})
 
     return template('templates/dvr_complete.tpl'), config
 
