@@ -49,7 +49,7 @@ def config_load_update(func):
         choosen_channels = redis_client.lrange('choosen_channels' + session, 0, -1)
         choosen_channels = [channel.decode('utf-8') for channel in choosen_channels]
 
-        output = func(uploaded_config, choosen_channels)
+        output = func(uploaded_config, choosen_channels, session)
 
         redis_client.json().set('uploaded_config' + session, Path.root_path(), output[1])
         return output[0]
@@ -92,7 +92,6 @@ def choose_channels(session):
 
     channel_list = []
     choosen_channels = []
-    changed_channels = []
 
     for stream in redis_client.json().get('uploaded_config' + session, Path('.streams')):
             channel_list.append(stream['name'])
@@ -107,17 +106,10 @@ def choose_channels(session):
 
     redis_client.rpush('choosen_channels' + session, *choosen_channels)
     
-    changed_channels = redis_client.lrange('changed_channels' + session, 0, -1)
-    changed_channels = [channel.decode('utf-8') for channel in changed_channels]
-
-    for channel in choosen_channels:
-        if channel not in changed_channels:
-            redis_client.rpush('changed_channels' + session, channel) 
-
     return template('templates/choosen_channels.tpl', names = choosen_channels)
 
 @config_load_update
-def dvr_settings(config, choosen_channels):
+def dvr_settings(config, choosen_channels, session):
 
     if request.method == 'GET':
         return template('templates/dvr_settings_form.tpl'), config
@@ -139,10 +131,12 @@ def dvr_settings(config, choosen_channels):
             if dvr_limit == 0:
                 del stream['dvr']
 
+            redis_client.json().set('changed_channels' + session, Path.root_path(), {stream['name'] : 'dvr'})
+
     return template('templates/dvr_complete.tpl'), config
 
 @config_load_update
-def source_priority(config, choosen_channels):
+def source_priority(config, choosen_channels, session):
 
     if request.method == 'GET':
         return template('templates/source_priority_form.tpl'), config
@@ -166,7 +160,7 @@ def source_priority(config, choosen_channels):
     return template('templates/source_priority_complete.tpl'), config
 
 @config_load_update
-def stream_sorting(config, choosen_channels):
+def stream_sorting(config, choosen_channels, session):
 
     if request.method == 'GET':
         return template('templates/stream_sorting_channels_form.tpl', names = choosen_channels), config
@@ -192,10 +186,9 @@ def config_upload_to_server_api(session):
     changed_channels = redis_client.lrange('changed_channels' + session, 0, -1)
     changed_channels = [channel.decode('utf-8') for channel in changed_channels]
 
-    api_call(''.join(('streams/', 'test')), 'PUT', {"position" : 0}, username, password)
-    #for stream in redis_client.json().get('uploaded_config' + session, Path('.streams')):
-    #    if stream['name'] in changed_channels:
-    #        api_call(''.join(('streams/', stream['name'])), 'PUT', stream, username, password)
+    for stream in redis_client.json().get('uploaded_config' + session, Path('.streams')):
+        if stream['name'] in changed_channels:
+            api_call(''.join(('streams/', stream['name'])), 'PUT', stream, username, password)
 
     redis_client.ltrim('changed_channels' + session, 1, 0)
 
