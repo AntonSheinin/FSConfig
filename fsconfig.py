@@ -10,7 +10,7 @@ import redis
 from redis.commands.json.path import Path
 from bottle import route, run, template, request, static_file, error, default_app, response
 
-allowed_IP = ['127.0.0.1', '62.90.52.94', '94.130.136.116']
+allowed_IP = ['127.0.0.1', '62.90.52.94', '94.130.136.116', '10.100.102.1']
 menu_links = {'main-menu' : 'main_menu',
              'choose-channels' : 'choose_channels',
              'dvr-settings' : 'dvr_settings',
