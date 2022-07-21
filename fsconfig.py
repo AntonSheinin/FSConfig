@@ -88,12 +88,19 @@ def http_error_handling(code):
 def main_menu(session):
     return template('templates/main_menu.tpl')
 
+def changed_channels_list_update(session, channel_name, channel_entity):
+    
+    count = redis_client.json().get('changed_channels' + session, '.count')
+
+    redis_client.json().set('changed_channels' + session, '.' + str(count), {'name' : channel_name, 'entity' : channel_entity})
+    redis_client.json().set('changed_channels' + session, '.count', count+1)
+
 def choose_channels(session):
 
     channel_list = []
     choosen_channels = []
 
-    for stream in redis_client.json().get('uploaded_config' + session, Path('.streams')):
+    for stream in redis_client.json().get('uploaded_config' + session, '.streams'):
             channel_list.append(stream['name'])
 
     if request.method == 'GET':
@@ -110,9 +117,6 @@ def choose_channels(session):
 
 @config_load_update
 def dvr_settings(config, choosen_channels, session):
-
-    #count = redis_client.json().get('changed_channels' + session, '.streams.count')
-    count = 0
 
     if request.method == 'GET':
         return template('templates/dvr_settings_form.tpl'), config
@@ -133,9 +137,8 @@ def dvr_settings(config, choosen_channels, session):
                              "storage_limit" : disc_space_limit_gb}
             if dvr_limit == 0:
                 del stream['dvr']
-
-            redis_client.json().set('changed_channels' + session, '.' + str(count), {'name' : stream['name'], 'entity' : 'dvr'})
-            count += 1
+            
+            changed_channels_list_update(session, stream['name'], 'dvr')
 
     return template('templates/dvr_complete.tpl'), config
 
