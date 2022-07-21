@@ -111,7 +111,8 @@ def choose_channels(session):
 @config_load_update
 def dvr_settings(config, choosen_channels, session):
 
-    count = redis_client.json().get('changed_channels' + session, '.streams.count')
+    #count = redis_client.json().get('changed_channels' + session, '.streams.count')
+    count = 0
 
     if request.method == 'GET':
         return template('templates/dvr_settings_form.tpl'), config
