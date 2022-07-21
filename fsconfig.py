@@ -134,7 +134,7 @@ def dvr_settings(config, choosen_channels, session):
             if dvr_limit == 0:
                 del stream['dvr']
 
-            redis_client.json().set('changed_channels' + session, '$.'+str(count), json.dump({'name' : stream['name'], 'entity' : 'dvr'}))
+            redis_client.json().set('changed_channels' + session, '$.'+str(count), json.dumps({'name' : stream['name'], 'entity' : 'dvr'}))
             count += 1
 
     return template('templates/dvr_complete.tpl'), config
