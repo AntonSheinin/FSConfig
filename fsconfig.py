@@ -7,7 +7,6 @@ import secrets
 from random import random
 from urllib import response
 import redis
-from redis.commands.json.path import Path
 from bottle import route, run, template, request, static_file, error, default_app, response
 
 allowed_IP = ['127.0.0.1', '62.90.52.94', '94.130.136.116', '10.100.102.1']
@@ -28,7 +27,7 @@ def api_call(query, request_method, json_payload, username, password):
     url = 'http://193.176.179.222:8085/flussonic/api/v3/'
 
     if request_method == 'GET':
-        response = requests.get(''.join((url, query)), auth = HTTPBasicAuth(username, password))
+        response = requests.get(''.join((url, query)), auth = {username, password})
         print(response.status_code)
 
     elif request_method == 'PUT':  
@@ -45,13 +44,13 @@ def config_load_update(func):
 
         uploaded_config = {}
 
-        uploaded_config.update(redis_client.json().get('uploaded_config' + session, Path.root_path()))
+        uploaded_config.update(redis_client.json().get('uploaded_config' + session, '.'))
         choosen_channels = redis_client.lrange('choosen_channels' + session, 0, -1)
         choosen_channels = [channel.decode('utf-8') for channel in choosen_channels]
 
         output = func(uploaded_config, choosen_channels, session)
 
-        redis_client.json().set('uploaded_config' + session, Path.root_path(), output[1])
+        redis_client.json().set('uploaded_config' + session, '.', output[1])
         return output[0]
 
     return wrapper
@@ -197,7 +196,7 @@ def config_upload_to_server_api(session):
     changed_channels = redis_client.lrange('changed_channels' + session, 0, -1)
     changed_channels = [channel.decode('utf-8') for channel in changed_channels]
 
-    for stream in redis_client.json().get('uploaded_config' + session, Path('.streams')):
+    for stream in redis_client.json().get('uploaded_config' + session, '.streams'):
         if stream['name'] in changed_channels:
             api_call(''.join(('streams/', stream['name'])), 'PUT', stream, username, password)
 
@@ -215,7 +214,7 @@ def config_load_from_server_api(session):
 
     config = api_call(''.join(('streams?limit=', str(stream_call['estimated_count'] + 10))),'GET', {}, username, password)
 
-    redis_client.json().set('uploaded_config' + session, Path.root_path(), config)
+    redis_client.json().set('uploaded_config' + session, '.', config)
 
     return template('templates/upload_complete.tpl')
 
@@ -224,14 +223,14 @@ def load_config_file_json(session):
     if request.method == 'GET':
         return template('templates/upload_file_form.tpl')
 
-    redis_client.json().set('uploaded_config' + session, Path.root_path(), json.load(request.files.get('config').file))
+    redis_client.json().set('uploaded_config' + session, '.', json.load(request.files.get('config').file))
 
     return template('templates/upload_complete.tpl')
 
 def download_config_file_json(session):
 
     with open('./output_config.json', 'w') as file:
-        json.dump(redis_client.json().get('uploaded_config' + session, Path.root_path()), file)
+        json.dump(redis_client.json().get('uploaded_config' + session, '.'), file)
 
     return static_file('output_config.json', root='./', download=True)
 
