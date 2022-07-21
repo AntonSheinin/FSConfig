@@ -92,10 +92,6 @@ def changed_channels_list_update(session, channel_name, channel_entity):
     
     changed_channels = redis_client.json().get('changed_channels' + session, '.')
 
-    print(changed_channels['count'])
-    print(channel_name)
-    print(channel_entity)
-
     redis_client.json().set('changed_channels' + session, '.' + str(changed_channels['count']), {'name' : channel_name, 'entity' : channel_entity})
     redis_client.json().set('changed_channels' + session, '.count', changed_channels['count'] + 1)
 
@@ -167,6 +163,8 @@ def source_priority(config, choosen_channels, session):
                     url['priority'] = second_condition_priority
                 else:
                     url['priority'] = default_priority
+        
+            changed_channels_list_update(session, stream['name'], 'source_priority')
 
     return template('templates/source_priority_complete.tpl'), config
 
@@ -179,6 +177,8 @@ def stream_sorting(config, choosen_channels, session):
     for stream in config['streams']:
         if stream['name'] in choosen_channels and request.forms.get(stream['name']) != '':
             stream['position'] = request.forms.get(stream['name'])
+
+            changed_channels_list_update(session, stream['name'], 'position')
 
     config['streams'].sort(key=lambda x: int(x.get('position')))
 
