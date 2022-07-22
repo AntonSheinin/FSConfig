@@ -198,9 +198,9 @@ def config_upload_to_server_api(session):
     password = request.forms.get('password')
 
     changed_channels = redis_client.json().get('changed_channels' + session,'.')
-    updated_config = redis_client.json().get('updated_config' + session, '.')
+    uploaded_config = redis_client.json().get('uploaded_config' + session, '.')
     
-    for stream in updated_config['streams']:
+    for stream in uploaded_config['streams']:
         if stream['name'] in changed_channels:
             print(stream['name'])
             api_call(''.join(('streams/', stream['name'])), 'PUT', stream[changed_channels['entity']], username, password)
