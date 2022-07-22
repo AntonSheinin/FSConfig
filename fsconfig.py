@@ -202,6 +202,7 @@ def config_upload_to_server_api(session):
     
     for stream in updated_config['streams']:
         if stream['name'] in changed_channels:
+            print(stream['name'])
             api_call(''.join(('streams/', stream['name'])), 'PUT', stream[changed_channels['entity']], username, password)
 
     redis_client.json().delete('changed_channels' + session)
