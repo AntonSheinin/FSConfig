@@ -205,8 +205,8 @@ def config_upload_to_server_api(session):
             print(stream['name'])
             api_call(''.join(('streams/', stream['name'])), 'PUT', stream[changed_channels['entity']], username, password)
 
-    redis_client.json().delete('changed_channels' + session)
-    redis_client.json().delete('changed_channels_count' + session)
+    #redis_client.json().delete('changed_channels' + session)
+    #redis_client.json().delete('changed_channels_count' + session)
 
 
 def config_load_from_server_api(session):
