@@ -27,7 +27,7 @@ def api_call(query, request_method, json_payload, username, password):
     url = 'http://193.176.179.222:8085/flussonic/api/v3/'
 
     if request_method == 'GET':
-        response = requests.get(''.join((url, query)), auth = {username, password})
+        response = requests.get(''.join((url, query)), auth = HTTPBasicAuth(username, password))
         print(response.status_code)
 
     elif request_method == 'PUT':  
@@ -88,7 +88,10 @@ def main_menu(session):
     return template('templates/main_menu.tpl')
 
 def changed_channels_list_update(session, channel_name, channel_entity):
-    
+
+    if not redis_client.exists('changed_channels' + session):
+        redis_client.json().set('changed_channels' + session,'.', {'count' : 0})
+
     changed_channels = redis_client.json().get('changed_channels' + session, '.')
 
     redis_client.json().set('changed_channels' + session, '.' + str(changed_channels['count']), {'name' : channel_name, 'entity' : channel_entity})
