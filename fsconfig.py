@@ -200,10 +200,12 @@ def config_upload_to_server_api(session):
     changed_channels = redis_client.json().get('changed_channels' + session,'.')
     updated_config = redis_client.json().get('updated_config' + session, '.')
     
-    for channel in changed_channels['streams']:
+    for channel in changed_channels:
         api_call(''.join(('streams/', channel['name'])), 'PUT', updated_config['streams'][channel['name']][channel['entity']], username, password)
 
-    redis_client.ltrim('changed_channels' + session, 1, 0)
+    redis_client.json().delete('changed_channels' + session)
+    redis_client.json().delete('changed_channels_count' + session)
+
 
 def config_load_from_server_api(session):
 
