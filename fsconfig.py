@@ -94,7 +94,7 @@ def changed_channels_list_update(session, channel_name, channel_entity):
 
     changed_channels = redis_client.json().get('changed_channels' + session, '.')
 
-    redis_client.json().set('changed_channels' + session, '.' + str(changed_channels['count']), {'name' : channel_name, 'entity' : channel_entity})
+    redis_client.json().set('changed_channels' + session, '.streams.' + str(changed_channels['count']), {'name' : channel_name, 'entity' : channel_entity})
     redis_client.json().set('changed_channels' + session, '.count', changed_channels['count'] + 1)
 
 def choose_channels(session):
@@ -188,20 +188,17 @@ def stream_sorting(config, choosen_channels, session):
 
 def config_upload_to_server_api(session):
 
-    changed_channels = []
-
     if request.method == 'GET':
         return template('templates/auth_form_upload.tpl')
 
     username = request.forms.get('username')
     password = request.forms.get('password')
 
-    changed_channels = redis_client.lrange('changed_channels' + session, 0, -1)
-    changed_channels = [channel.decode('utf-8') for channel in changed_channels]
-
-    for stream in redis_client.json().get('uploaded_config' + session, '.streams'):
-        if stream['name'] in changed_channels:
-            api_call(''.join(('streams/', stream['name'])), 'PUT', stream, username, password)
+    changed_channels = redis_client.json().get('changed_channels' + session,'.')
+    updated_config = redis_client.json().get('updated_config' + session, '.')
+    
+    for channel in changed_channels['streams']:
+        api_call(''.join(('streams/', channel['name'])), 'PUT', updated_config['streams'][channel['name']][channel['entity']], username, password)
 
     redis_client.ltrim('changed_channels' + session, 1, 0)
 
