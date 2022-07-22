@@ -200,8 +200,10 @@ def config_upload_to_server_api(session):
     changed_channels = redis_client.json().get('changed_channels' + session,'.')
     uploaded_config = redis_client.json().get('uploaded_config' + session, '.')
     
+    print(changed_channels)
+
     for i in changed_channels:
-        print(i)
+        print(i['name'])
 
     for stream in uploaded_config['streams']:
         if stream['name'] in changed_channels:
