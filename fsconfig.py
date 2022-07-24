@@ -89,16 +89,13 @@ def main_menu(session):
 
 def changed_channels_list_update(session, channel_name, channel_entity):
 
-    if not redis_client.exists('changed_channels_count' + session):
-        redis_client.set('changed_channels_count' + session, 0)
-
     if not redis_client.exists('changed_channels' + session):
         redis_client.json().set('changed_channels' + session,'.', {'count' : '0', 'streams' : []})
 
     count = int(redis_client.json().get('changed_channels' + session, '.count'))
     changed_channels = redis_client.json().get('changed_channels'+ session, '.')
 
-    changed_channels.update({'streams' : [{'name' : channel_name, 'entity' : channel_entity}]})
+    changed_channels['streams'].update({'name' : channel_name, 'entity' : channel_entity})
     count += 1
     changed_channels.update({'count' : count})
 
