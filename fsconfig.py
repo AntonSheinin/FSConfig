@@ -146,7 +146,8 @@ def dvr_settings(config, choosen_channels, session):
             if dvr_limit == 0:
                 del stream['dvr']
             
-            changed_channels_list_update(session, stream['name'], 'dvr')
+            #changed_channels_list_update(session, stream['name'], 'dvr')
+            redis_client.rpush('changed_channels' + session, json.dumps({'name' : stream['name'], 'entity' : 'dvr'}))
 
     return template('templates/dvr_complete.tpl'), config
 
@@ -172,7 +173,8 @@ def source_priority(config, choosen_channels, session):
                 else:
                     url['priority'] = default_priority
         
-            changed_channels_list_update(session, stream['name'], 'source_priority')
+            #changed_channels_list_update(session, stream['name'], 'source_priority')
+            redis_client.rpush('changed_channels' + session, json.dumps({'name' : stream['name'], 'entity' : 'source_priority'}))
 
     return template('templates/source_priority_complete.tpl'), config
 
@@ -186,7 +188,9 @@ def stream_sorting(config, choosen_channels, session):
         if stream['name'] in choosen_channels and request.forms.get(stream['name']) != '':
             stream['position'] = request.forms.get(stream['name'])
 
-            changed_channels_list_update(session, stream['name'], 'position')
+            #changed_channels_list_update(session, stream['name'], 'position')
+            redis_client.rpush('changed_channels' + session, json.dumps({'name' : stream['name'], 'entity' : 'position'}))
+
 
     config['streams'].sort(key=lambda x: int(x.get('position')))
 
