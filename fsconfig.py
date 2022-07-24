@@ -208,16 +208,15 @@ def config_upload_to_server_api(session):
     changed_channels = [channel.decode('utf-8') for channel in changed_channels]
     changed_channels = [json.loads(channel) for channel in changed_channels]
 
-
     print(changed_channels)
 
     for i in changed_channels:
         print(i['name'])
 
-    #for stream in uploaded_config['streams']:
-    #    if stream['name'] in changed_channels:
-    #       print(stream['name'])
-    #       api_call(''.join(('streams/', stream['name'])), 'PUT', stream[changed_channels['entity']], username, password)
+    for stream in uploaded_config['streams']:
+        if stream['name'] in changed_channels:
+           print(stream['name'])
+           api_call(''.join(('streams/', stream['name'])), 'PUT', stream[changed_channels['entity']], username, password)
 
     #redis_client.json().delete('changed_channels' + session)
 
