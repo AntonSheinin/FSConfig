@@ -218,7 +218,7 @@ def config_upload_to_server_api(session):
     for stream in uploaded_config['streams']:
         if stream['name'] in channel_dict.values():
            print(stream['name'])
-           print(stream[channel_dict['entity']])
+           print('{"dvr" : ' + stream[channel_dict['entity']] + '}')
            #api_call(''.join(('streams/', stream['name'])), 'PUT', stream[channel_dict['entity']], username, password)
 
     #redis_client.json().delete('changed_channels' + session)
