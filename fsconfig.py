@@ -194,6 +194,8 @@ def stream_sorting(config, choosen_channels, session):
 
 def config_upload_to_server_api(session):
 
+    channel_dict = {}
+
     if request.method == 'GET':
         return template('templates/auth_form_upload.tpl')
 
@@ -210,10 +212,13 @@ def config_upload_to_server_api(session):
 
     print(changed_channels)
 
+    for channel in changed_channels:
+        channel_dict.update(channel)
+
     for stream in uploaded_config['streams']:
-        if stream['name'] in changed_channels.values():
+        if stream['name'] in channel_dict.values():
            print(stream['name'])
-           api_call(''.join(('streams/', stream['name'])), 'PUT', stream[changed_channels['entity']], username, password)
+           api_call(''.join(('streams/', stream['name'])), 'PUT', stream[channel_dict['entity']], username, password)
 
     #redis_client.json().delete('changed_channels' + session)
 
