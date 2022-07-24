@@ -98,7 +98,7 @@ def changed_channels_list_update(session, channel_name, channel_entity):
     count = int(redis_client.json().get('changed_channels' + session, '.count'))
     changed_channels.update(redis_client.json().get('changed_channels'+ session, '.'))
 
-    print(changed_channels)
+    print(type(changed_channels))
 
     changed_channels['streams'][channel_name] = channel_entity
     count += 1
