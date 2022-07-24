@@ -200,7 +200,7 @@ def config_upload_to_server_api(session):
     username = request.forms.get('username')
     password = request.forms.get('password')
 
-    changed_channels = redis_client.lrange('changed_channels', 0, -1)
+    changed_channels = redis_client.lrange('changed_channels'+ session, 0, -1)
     uploaded_config = redis_client.json().get('uploaded_config' + session, '.')
 
     print(changed_channels)
