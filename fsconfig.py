@@ -146,8 +146,7 @@ def dvr_settings(config, choosen_channels, session):
             if dvr_limit == 0:
                 del stream['dvr']
             
-            #changed_channels_list_update(session, stream['name'], 'dvr')
-            redis_client.rpush('changed_channels' + session, json.dumps({'name' : stream['name'], 'entity' : 'dvr'}))
+            changed_channels_list_update(session, stream['name'], 'dvr')
 
     return template('templates/dvr_complete.tpl'), config
 
@@ -173,8 +172,7 @@ def source_priority(config, choosen_channels, session):
                 else:
                     url['priority'] = default_priority
         
-            #changed_channels_list_update(session, stream['name'], 'source_priority')
-            redis_client.rpush('changed_channels' + session, json.dumps({'name' : stream['name'], 'entity' : 'source_priority'}))
+            changed_channels_list_update(session, stream['name'], 'source_priority')
 
     return template('templates/source_priority_complete.tpl'), config
 
@@ -188,9 +186,7 @@ def stream_sorting(config, choosen_channels, session):
         if stream['name'] in choosen_channels and request.forms.get(stream['name']) != '':
             stream['position'] = request.forms.get(stream['name'])
 
-            #changed_channels_list_update(session, stream['name'], 'position')
-            redis_client.rpush('changed_channels' + session, json.dumps({'name' : stream['name'], 'entity' : 'position'}))
-
+            changed_channels_list_update(session, stream['name'], 'position')
 
     config['streams'].sort(key=lambda x: int(x.get('position')))
 
@@ -204,18 +200,23 @@ def config_upload_to_server_api(session):
     username = request.forms.get('username')
     password = request.forms.get('password')
 
-    changed_channels = redis_client.json().get('changed_channels' + session,'.')
+    changed_channels = redis_client.lrange('changed_channels', 0, -1)
     uploaded_config = redis_client.json().get('uploaded_config' + session, '.')
-    
+
+    print(changed_channels)
+
+    for channel in changed_channels:
+        channel = json.loads(channel)
+
     print(changed_channels)
 
     for i in changed_channels:
         print(i['name'])
 
-    for stream in uploaded_config['streams']:
-        if stream['name'] in changed_channels:
-            print(stream['name'])
-            api_call(''.join(('streams/', stream['name'])), 'PUT', stream[changed_channels['entity']], username, password)
+    #for stream in uploaded_config['streams']:
+    #    if stream['name'] in changed_channels:
+    #       print(stream['name'])
+    #       api_call(''.join(('streams/', stream['name'])), 'PUT', stream[changed_channels['entity']], username, password)
 
     #redis_client.json().delete('changed_channels' + session)
 
