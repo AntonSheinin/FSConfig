@@ -93,7 +93,7 @@ def changed_channels_list_update(session, channel_name, channel_entity):
         redis_client.set('changed_channels_count' + session, 0)
 
     if not redis_client.exists('changed_channels' + session):
-        redis_client.json().set('changed_channels' + session,'.', {'streams[]'})
+        redis_client.json().set('changed_channels' + session,'.', {'streams : []'})
 
     count = int(redis_client.get('changed_channels_count' + session))
     
