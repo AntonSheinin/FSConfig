@@ -93,15 +93,11 @@ def changed_channels_list_update(session, channel_name, channel_entity):
     changed_channels = {}
 
     if not redis_client.exists('changed_channels' + session):
-        redis_client.json().set('changed_channels' + session,'.', {'count' : '0', 'streams' : []})
+        redis_client.json().set('changed_channels' + session,'.', {'streams' : []})
 
-    count = int(redis_client.json().get('changed_channels' + session, '.count'))
     changed_channels.update(redis_client.json().get('changed_channels'+ session, '.'))
 
     changed_channels['streams'].append({'name' : channel_name, 'entity' : channel_entity})
-
-    count += 1
-    changed_channels.update({'count' : count})
 
     redis_client.json().set('changed_channels' + session, '.', changed_channels)
     
@@ -216,8 +212,6 @@ def config_upload_to_server_api(session):
             api_call(''.join(('streams/', stream['name'])), 'PUT', stream[changed_channels['entity']], username, password)
 
     #redis_client.json().delete('changed_channels' + session)
-    #redis_client.delete('changed_channels_count' + session)
-
 
 def config_load_from_server_api(session):
 
