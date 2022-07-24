@@ -90,17 +90,19 @@ def main_menu(session):
 
 def changed_channels_list_update(session, channel_name, channel_entity):
 
-    changed_channels = {}
+    #changed_channels = {}
 
-    if not redis_client.exists('changed_channels' + session):
-        redis_client.json().set('changed_channels' + session,'.', {'streams' : []})
+    #if not redis_client.exists('changed_channels' + session):
+    #    redis_client.json().set('changed_channels' + session,'.', {'streams' : []})
 
-    changed_channels.update(redis_client.json().get('changed_channels'+ session, '.'))
+    #changed_channels.update(redis_client.json().get('changed_channels'+ session, '.'))
 
-    changed_channels['streams'].append({'name' : channel_name, 'entity' : channel_entity})
+    #changed_channels['streams'].append({'name' : channel_name, 'entity' : channel_entity})
 
-    redis_client.json().set('changed_channels' + session, '.', changed_channels)
+    #redis_client.json().set('changed_channels' + session, '.', changed_channels)
     
+    redis_client.rpush('changed_channels' + session, {'name' : channel_name, 'entity' : channel_entity})
+
 def choose_channels(session):
 
     channel_list = []
