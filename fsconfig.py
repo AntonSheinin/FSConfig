@@ -206,6 +206,8 @@ def config_upload_to_server_api(session):
     print(changed_channels)
 
     changed_channels = [channel.decode('utf-8') for channel in changed_channels]
+    changed_channels = [json.loads(channel) for channel in changed_channels]
+
 
     print(changed_channels)
 
