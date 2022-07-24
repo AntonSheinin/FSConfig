@@ -101,7 +101,7 @@ def changed_channels_list_update(session, channel_name, channel_entity):
 
     #redis_client.json().set('changed_channels' + session, '.', changed_channels)
     
-    redis_client.rpush('changed_channels' + session, {'name' : channel_name, 'entity' : channel_entity})
+    redis_client.rpush('changed_channels' + session, json.dumps({'name' : channel_name, 'entity' : channel_entity}))
 
 def choose_channels(session):
 
