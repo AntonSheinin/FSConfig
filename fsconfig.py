@@ -211,7 +211,7 @@ def config_upload_to_server_api(session):
     print(changed_channels)
 
     for stream in uploaded_config['streams']:
-        if stream['name'] in changed_channels['name']:
+        if stream['name'] in changed_channels.values():
            print(stream['name'])
            api_call(''.join(('streams/', stream['name'])), 'PUT', stream[changed_channels['entity']], username, password)
 
