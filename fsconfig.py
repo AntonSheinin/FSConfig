@@ -201,13 +201,11 @@ def config_upload_to_server_api(session):
 
     username = request.forms.get('username')
     password = request.forms.get('password')
-
-    changed_channels = redis_client.lrange('changed_channels'+ session, 0, -1)
+    
     uploaded_config = redis_client.json().get('uploaded_config' + session, '.')
 
-    print(changed_channels)
-
-    changed_channels = [channel.decode('utf-8') for channel in changed_channels]
+    changed_channels = redis_client.lrange('changed_channels'+ session, 0, -1)
+    #changed_channels = [channel.decode('utf-8') for channel in changed_channels]
     changed_channels = [json.loads(channel) for channel in changed_channels]
 
     print(changed_channels)
