@@ -172,7 +172,7 @@ def source_priority(config, choosen_channels, session):
                 else:
                     url['priority'] = default_priority
         
-            changed_channels_list_update(session, stream['name'], 'source_priority')
+            changed_channels_list_update(session, stream['name'], 'inputs')
 
     return template('templates/source_priority_complete.tpl'), config
 
