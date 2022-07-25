@@ -218,7 +218,6 @@ def config_upload_to_server_api(session):
 
     return template('templates/upload_api_complete.tpl')
 
-
 def config_load_from_server_api(session):
 
     if request.method == 'GET':
