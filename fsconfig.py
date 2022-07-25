@@ -205,10 +205,7 @@ def config_upload_to_server_api(session):
     uploaded_config = redis_client.json().get('uploaded_config' + session, '.')
 
     changed_channels = redis_client.lrange('changed_channels'+ session, 0, -1)
-    #changed_channels = [channel.decode('utf-8') for channel in changed_channels]
     changed_channels = [json.loads(channel) for channel in changed_channels]
-
-    print(changed_channels)
 
     for channel in changed_channels:
         channel_dict.update(channel)
@@ -217,7 +214,7 @@ def config_upload_to_server_api(session):
         if stream['name'] in channel_dict.values():
             api_call(''.join(('streams/', stream['name'])), 'PUT', json.loads('{' + json.dumps(channel_dict['entity']) + ':' + json.dumps(stream[channel_dict['entity']]) + '}'), username, password)
 
-    redis_client.json().delete('changed_channels' + session)
+    redis_client.delete('changed_channels' + session)
 
 def config_load_from_server_api(session):
 
