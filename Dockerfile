@@ -8,5 +8,5 @@ COPY ./requirements.txt /home/code/fsconfig/
 RUN pip3 install -r requirements.txt
 COPY ./ /home/code/fsconfig/
 USER code
-ENTRYPOINT gunicorn -w 2 -b 0.0.0.0:8080 --reload --log-level debug fsconfig:app
+ENTRYPOINT gunicorn -w 2 -b 10.100.102.6:8080 --reload --log-level debug fsconfig:app
 
