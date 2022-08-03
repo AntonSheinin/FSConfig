@@ -21,7 +21,7 @@ menu_links = {'main-menu' : 'main_menu',
              'config-upload-api' : 'config_upload_to_server_api',
              'config-load-api' : 'config_load_from_server_api'}
 
-redis_client = redis.Redis(host='localhost', port=6379, db=0)
+redis_client = redis.Redis(host='redis', port=6379, db=0)
 
 def api_call(query, request_method, json_payload, username, password):
 
