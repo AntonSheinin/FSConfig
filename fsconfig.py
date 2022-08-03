@@ -10,7 +10,7 @@ from urllib import response
 import redis
 from bottle import route, run, template, request, static_file, error, default_app, response
 
-allowed_IP = ['127.0.0.1', '62.90.52.94', '94.130.136.116', '10.100.102.1']
+allowed_IP = ['127.0.0.1', '62.90.52.94', '94.130.136.116', '10.100.102.6']
 menu_links = {'main-menu' : 'main_menu',
              'choose-channels' : 'choose_channels',
              'dvr-settings' : 'dvr_settings',
@@ -90,17 +90,6 @@ def main_menu(session):
 
 def changed_channels_list_update(session, channel_name, channel_entity):
 
-    #changed_channels = {}
-
-    #if not redis_client.exists('changed_channels' + session):
-    #    redis_client.json().set('changed_channels' + session,'.', {'streams' : []})
-
-    #changed_channels.update(redis_client.json().get('changed_channels'+ session, '.'))
-
-    #changed_channels['streams'].append({'name' : channel_name, 'entity' : channel_entity})
-
-    #redis_client.json().set('changed_channels' + session, '.', changed_channels)
-    
     redis_client.rpush('changed_channels' + session, json.dumps({'name' : channel_name, 'entity' : channel_entity}))
 
 def choose_channels(session):

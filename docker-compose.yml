@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  fsconfig:
+    image: fsconfig
+    build:
+      context: ./fsconfig
+      dockerfile: Dockerfile
+    depends_on:
+      -  redis-stack-server
+                    
+  redis-stack-server:
+    image: redis/redis-stack-server:latest
+    ports:
+      - 6379:6379
+  
