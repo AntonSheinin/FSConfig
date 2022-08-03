@@ -9,10 +9,10 @@ services:
     depends_on:
       -  redis-stack-server
     ports:
-      - 8000:8000
+      - "127.0.0.1:8000:8000"
        
   redis-stack-server:
     image: redis/redis-stack-server:latest
     ports:
-      - 6379:6379
+      - "6379:6379"
   
