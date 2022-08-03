@@ -1,7 +1,7 @@
 version: "3.9"
 
 services:
-  fsconfig:
+  web:
     image: fsconfig
     build:
       context: .
@@ -9,9 +9,8 @@ services:
     depends_on:
       -  redis-stack-server
     ports:
-      - "127.0.0.1:8080:8080"
-
-                    
+      - "8080:8080"
+       
   redis-stack-server:
     image: redis/redis-stack-server:latest
     ports:
