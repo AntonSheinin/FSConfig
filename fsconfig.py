@@ -59,9 +59,9 @@ def config_load_update(func):
 @route('/<url>', method=['GET','POST'])
 def router(url):
 
-    if (request.environ.get('HTTP_X_FORWARDED_FOR') is not None and request.environ.get('HTTP_X_FORWARDED_FOR') not in allowed_IP) or request.environ.get('REMOTE_ADDR') not in allowed_IP:
-        print(request.environ.get('REMOTE_ADDR'))
-        return(http_error_handling(403))
+    #if (request.environ.get('HTTP_X_FORWARDED_FOR') is not None and request.environ.get('HTTP_X_FORWARDED_FOR') not in allowed_IP) or request.environ.get('REMOTE_ADDR') not in allowed_IP:
+    #    print(request.environ.get('REMOTE_ADDR'))
+    #    return(http_error_handling(403))
 
     session_id = request.get_cookie('sessionid')
     print(session_id)
