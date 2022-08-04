@@ -1,7 +1,7 @@
-FSConfig
-This is a bottle based application for multiple stream config update for Flussonic Media Server
+###FSConfig
+a Bottle framework based application for multiple stream config update for Flussonic Media Server
 
-Installation
+##Installation
 You may use virtual env in a following way:
 
 python3 -m venv ~/venv/fsconfig
