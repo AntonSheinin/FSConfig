@@ -1,8 +1,13 @@
-###FSConfig
+### FSConfig
 a Bottle framework based application for multiple stream config update for Flussonic Media Server
 
-##Installation
-You may use virtual env in a following way:
+## Run
 
-python3 -m venv ~/venv/fsconfig
-source ~/fsconfig/venv/bin/activate
+to run in docker compose
+
+```shell
+docker compose up --build
+```
+
+## Usage
+ Access the app on <server-ip-addr>:8000
