@@ -1,4 +1,4 @@
-### FSConfig
+# FSConfig
 a Bottle framework based application for multiple stream config update for Flussonic Media Server
 
 ## Run
