@@ -14,7 +14,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__) 
 
-allowed_IP = ['127.0.0.1', '62.90.52.94', '94.130.136.116', '10.100.102.6']
+allowed_IP = ['127.0.0.1', '62.90.52.94', '94.130.136.116', '10.100.102.6', '10.100.102.30']
 menu_links = {'main-menu' : 'main_menu',
              'choose-channels' : 'choose_channels',
              'dvr-settings' : 'dvr_settings',
