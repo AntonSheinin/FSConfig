@@ -1,15 +1,13 @@
 #fsconfig.py - Webapp for Flussonic Streaming Server mutliple streams config edit
 
-from distutils.util import change_root
 import json
+import secrets
+from urllib import response
+import logging 
 import requests
 from requests.auth import HTTPBasicAuth
-import secrets
-from random import random
-from urllib import response
 import redis
-from bottle import route, run, template, request, static_file, error, default_app, response
-import logging  
+from bottle import route, template, request, static_file, default_app, response
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__) 
@@ -67,7 +65,7 @@ def router(url):
         print(request.environ.get('REMOTE_ADDR'))
         logger.info(request.environ.get('REMOTE_ADDR')) 
         logger.info(request.environ.get('HTTP_X_FORWARDED_FOR'))
-        return(http_error_handling(403))
+        return http_error_handling(403)
     
     logger.info(request.environ.get('REMOTE_ADDR')) 
     logger.info(request.environ.get('HTTP_X_FORWARDED_FOR'))
@@ -79,9 +77,9 @@ def router(url):
         response.set_cookie('sessionid', session_id)
 
     if url in menu_links:
-        return(globals()[menu_links[url]](session_id))
+        return globals()[menu_links[url]](session_id)
 
-    return(http_error_handling(404))
+    return http_error_handling(404)
 
 @route('/')
 def router_wrapper():
@@ -90,9 +88,9 @@ def router_wrapper():
 def http_error_handling(code):
 
     if code == 403:
-        return('access denied')
+        return 'access denied'
     if code == 404:
-        return('page doesnt exist')
+        return 'page doesnt exist'
 
 def main_menu(session):
     return template('templates/main_menu.tpl')
@@ -243,7 +241,7 @@ def load_config_file_json(session):
 
 def download_config_file_json(session):
 
-    with open('./output_config.json', 'w') as file:
+    with open('./output_config.json', 'w', encoding='utf-8') as file:
         json.dump(redis_client.json().get('uploaded_config' + session, '.'), file)
 
     return static_file('output_config.json', root='./', download=True)
