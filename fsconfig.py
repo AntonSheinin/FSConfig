@@ -1,16 +1,24 @@
-#fsconfig.py - Webapp for Flussonic Streaming Server mutliple streams config edit
+'''
+    fsconfig.py - Webapp for Flussonic Streaming Server mutliple streams config edit
+'''
+
+# pylint: disable=missing-module-docstring
+# pylint: disable=missing-class-docstring
+# pylint: disable=missing-function-docstring
+# pylint: disable=maybe-no-member
+# pylint: disable=line-too-long
 
 import json
 import secrets
-from urllib import response
-import logging 
+import logging
+from typing import Callable
 import requests
 from requests.auth import HTTPBasicAuth
 import redis
 from bottle import route, template, request, static_file, default_app, response
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__) 
+logger = logging.getLogger(__name__)
 
 allowed_IP = ['127.0.0.1', '62.90.52.94', '94.130.136.116', '10.100.102.6', '10.100.102.30']
 menu_links = {'main-menu' : 'main_menu',
@@ -25,25 +33,31 @@ menu_links = {'main-menu' : 'main_menu',
 
 redis_client = redis.Redis(host='redis', port=6379, db=0)
 
-def api_call(query, request_method, json_payload, username, password):
+def api_call(query: str,
+             request_method: str,
+             json_payload: dict,
+             username: str,
+             password: str) -> dict:
 
     url = 'http://193.176.179.222:8085/flussonic/api/v3/'
 
     if request_method == 'GET':
-        response = requests.get(''.join((url, query)), auth = HTTPBasicAuth(username, password))
-        print(response.status_code)
+        resp = requests.get(''.join((url, query)), auth = HTTPBasicAuth(username, password))
+        print(resp.status_code)
 
-    elif request_method == 'PUT':  
-        response = requests.put(''.join((url, query)), json = json_payload, auth = HTTPBasicAuth(username, password))
-        print(response.status_code)
+    elif request_method == 'PUT':
+        resp = requests.put(''.join((url, query)), json = json_payload, auth = HTTPBasicAuth(username, password))
+
+        print(resp.status_code)
 
     else:
         print('request method not supported')
 
-    return response.json()
+    return resp.json()
 
-def config_load_update(func):
-    def wrapper(session):
+
+def config_load_update(func: Callable) -> Callable:
+    def wrapper(session: str) -> list:
 
         uploaded_config = {}
 
@@ -58,20 +72,21 @@ def config_load_update(func):
 
     return wrapper
 
-@route('/<url>', method=['GET','POST'])
-def router(url):
 
-    if (request.environ.get('HTTP_X_FORWARDED_FOR') is not None and request.environ.get('HTTP_X_FORWARDED_FOR') not in allowed_IP) or request.environ.get('REMOTE_ADDR') not in allowed_IP:
-        print(request.environ.get('REMOTE_ADDR'))
-        logger.info(request.environ.get('REMOTE_ADDR')) 
-        logger.info(request.environ.get('HTTP_X_FORWARDED_FOR'))
-        return http_error_handling(403)
-    
-    logger.info(request.environ.get('REMOTE_ADDR')) 
-    logger.info(request.environ.get('HTTP_X_FORWARDED_FOR'))
+@route('/<url>', method=['GET','POST'])
+def router(url: str) -> str:
+
+    #if (request.environ.get('HTTP_X_FORWARDED_FOR') is not None and request.environ.get('HTTP_X_FORWARDED_FOR') not in allowed_IP) or request.environ.get('REMOTE_ADDR') not in allowed_IP:
+    #    logger.info(request.environ.get('REMOTE_ADDR'))
+    #    logger.info(request.environ.get('HTTP_X_FORWARDED_FOR'))
+    #    return http_error_handling(403)
+
+    logger.info('REMOTE_ADDR : %s', request.environ.get('REMOTE_ADDR'))
+    logger.info('FORWARDED : %s', request.environ.get('HTTP_X_FORWARDED_FOR'))
 
     session_id = request.get_cookie('sessionid')
-    print(session_id)
+    logger.info(f'Session ID : {session_id}')
+
     if session_id is None:
         session_id = secrets.token_urlsafe(8)
         response.set_cookie('sessionid', session_id)
@@ -81,46 +96,46 @@ def router(url):
 
     return http_error_handling(404)
 
+
 @route('/')
 def router_wrapper():
-        return router('main-menu')
+    return router('main-menu')
 
-def http_error_handling(code):
+
+def http_error_handling(code: int) -> str:
 
     if code == 403:
         return 'access denied'
     if code == 404:
-        return 'page doesnt exist'
+        return "page doesn't exist"
 
-def main_menu(session):
+
+def main_menu(_):
     return template('templates/main_menu.tpl')
 
-def changed_channels_list_update(session, channel_name, channel_entity):
 
+def changed_channels_list_update(session: str, channel_name: str, channel_entity: str) -> None:
     redis_client.rpush('changed_channels' + session, json.dumps({'name' : channel_name, 'entity' : channel_entity}))
 
-def choose_channels(session):
 
-    channel_list = []
+def choose_channels(session: str):
+
+    channel_list = [stream['name'] for stream in redis_client.json().get('uploaded_config' + session, '.streams')]
     choosen_channels = []
-
-    for stream in redis_client.json().get('uploaded_config' + session, '.streams'):
-            channel_list.append(stream['name'])
 
     if request.method == 'GET':
         redis_client.ltrim('choosen_channels' + session, 1, 0)
         return template('templates/choose_channels_form.tpl', names = channel_list)
 
-    for channel in channel_list:
-        if request.forms.get(channel) == 'on':
-            choosen_channels.append(channel)
+    choosen_channels = [channel for channel in channel_list if request.forms.get(channel) == 'on']
 
     redis_client.rpush('choosen_channels' + session, *choosen_channels)
-    
+
     return template('templates/choosen_channels.tpl', names = choosen_channels)
 
+
 @config_load_update
-def dvr_settings(config, choosen_channels, session):
+def dvr_settings(config: dict, choosen_channels: list, session: str):
 
     if request.method == 'GET':
         return template('templates/dvr_settings_form.tpl'), config
@@ -141,13 +156,14 @@ def dvr_settings(config, choosen_channels, session):
                              "storage_limit" : disc_space_limit_gb}
             if dvr_limit == 0:
                 del stream['dvr']
-            
+
             changed_channels_list_update(session, stream['name'], 'dvr')
 
     return template('templates/dvr_complete.tpl'), config
 
+
 @config_load_update
-def source_priority(config, choosen_channels, session):
+def source_priority(config: dict, choosen_channels: list, session: str):
 
     if request.method == 'GET':
         return template('templates/source_priority_form.tpl'), config
@@ -167,13 +183,14 @@ def source_priority(config, choosen_channels, session):
                     url['priority'] = second_condition_priority
                 else:
                     url['priority'] = default_priority
-        
+
             changed_channels_list_update(session, stream['name'], 'inputs')
 
     return template('templates/source_priority_complete.tpl'), config
 
+
 @config_load_update
-def stream_sorting(config, choosen_channels, session):
+def stream_sorting(config: dict, choosen_channels: list, session: str):
 
     if request.method == 'GET':
         return template('templates/stream_sorting_channels_form.tpl', names = choosen_channels), config
@@ -181,40 +198,36 @@ def stream_sorting(config, choosen_channels, session):
     for stream in config['streams']:
         if stream['name'] in choosen_channels and request.forms.get(stream['name']) != '':
             stream['position'] = request.forms.get(stream['name'])
-
             changed_channels_list_update(session, stream['name'], 'position')
 
     config['streams'].sort(key=lambda x: int(x.get('position')))
 
     return template('templates/sorting_complete.tpl'), config
 
-def config_upload_to_server_api(session):
 
-    channel_dict = {}
+def config_upload_to_server_api(session: str):
 
     if request.method == 'GET':
         return template('templates/auth_form_upload.tpl')
 
     username = request.forms.get('username')
     password = request.forms.get('password')
-    
+
     uploaded_config = redis_client.json().get('uploaded_config' + session, '.')
 
     changed_channels = redis_client.lrange('changed_channels'+ session, 0, -1)
-    changed_channels = [json.loads(channel) for channel in changed_channels]
-
-    for channel in changed_channels:
-        channel_dict.update(channel)
+    changed_channels = [json.loads(channel.decode('utf-8')) for channel in changed_channels]
 
     for stream in uploaded_config['streams']:
-        if stream['name'] in channel_dict.values():
-            api_call(''.join(('streams/', stream['name'])), 'PUT', json.loads('{' + json.dumps(channel_dict['entity']) + ':' + json.dumps(stream[channel_dict['entity']]) + '}'), username, password)
+        if stream['name'] in changed_channels:
+            api_call(''.join(('streams/', stream['name'])), 'PUT', json.loads('{' + changed_channels['entity'] + ':' + stream[changed_channels['entity']] + '}'), username, password)
 
-    redis_client.delete('changed_channels' + session)
+    #redis_client.delete('changed_channels' + session)
 
     return template('templates/upload_api_complete.tpl')
 
-def config_load_from_server_api(session):
+
+def config_load_from_server_api(session: str):
 
     if request.method == 'GET':
         return template('templates/auth_form_download.tpl')
@@ -230,7 +243,8 @@ def config_load_from_server_api(session):
 
     return template('templates/upload_complete.tpl')
 
-def load_config_file_json(session):
+
+def load_config_file_json(session: str):
 
     if request.method == 'GET':
         return template('templates/upload_file_form.tpl')
@@ -239,7 +253,8 @@ def load_config_file_json(session):
 
     return template('templates/upload_complete.tpl')
 
-def download_config_file_json(session):
+
+def download_config_file_json(session: str):
 
     with open('./output_config.json', 'w', encoding='utf-8') as file:
         json.dump(redis_client.json().get('uploaded_config' + session, '.'), file)
