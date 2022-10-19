@@ -2,7 +2,6 @@
 # pylint: disable=missing-class-docstring
 # pylint: disable=missing-function-docstring
 # pylint: disable=maybe-no-member
-# pylint: disable=line-too-long
 
 import json
 import logging
@@ -36,8 +35,29 @@ def choose_channels(session: str):
     return template('templates/choosen_channels.tpl', names = choosen_channels)
 
 
+def direct_api_query(session: str):
+
+    if request.method == 'GET':
+        return template('templates/direct_api_query.tpl')
+
+    choosen_channels = redis_client.lrange('choosen_channels' + session, 0, -1)
+    choosen_channels = [channel.decode('utf-8') for channel in choosen_channels]
+
+    username = request.forms.get('username')
+    password = request.forms.get('password')
+    api_query = request.forms.get('api_query')
+
+    for stream in choosen_channels:
+        api_call('streams/' + stream, 'PUT', json.loads(api_query), username, password)
+
+    redis_client.delete('choosen_channels' + session)
+
+    return template('templates/direct_api_query_complete.tpl')
+
 @config_load_update
 def dvr_settings(config: dict, choosen_channels: list, session: str):
+
+    changed = {}
 
     if request.method == 'GET':
         return template('templates/dvr_settings_form.tpl'), config
@@ -49,17 +69,20 @@ def dvr_settings(config: dict, choosen_channels: list, session: str):
 
     for stream in config['streams']:
         if stream['name'] in choosen_channels:
-            stream['dvr'] = {"disk_space" : disc_space_limit_gb,
+            changed['dvr'] = {
+                             "disk_space" : disc_space_limit_gb,
                              "disk_limit" : disc_space_limit_perc,
                              "disk_usage_limit" : disc_space_limit_perc,
                              "dvr_limit" : dvr_limit,
                              "expiration" : dvr_limit,
                              "root" : dvr_root,
-                             "storage_limit" : disc_space_limit_gb}
+                             "storage_limit" : disc_space_limit_gb
+                             }
+
             if dvr_limit == 0:
                 del stream['dvr']
 
-            changed_channels_list_update(session, stream['name'], 'dvr')
+            changed_channels_list_update(session, stream['name'], 'dvr', changed['dvr'])
 
     return template('templates/dvr_complete.tpl'), config
 
@@ -71,19 +94,31 @@ def source_priority(config: dict, choosen_channels: list, session: str):
         return template('templates/source_priority_form.tpl'), config
 
     first_condition = request.forms.get('first_condition')
-    first_condition_priority = request.forms.get('first_condition_priority')
     second_condition = request.forms.get('second_condition')
-    second_condition_priority = request.forms.get('second_condition_priority')
-    default_priority = request.forms.get('default_priority')
+
+    if (first_condition_priority := request.forms.get('first_condition_priority')) == '':
+        first_condition_priority = -1
+    else:
+        first_condition_priority = int(first_condition_priority)
+
+    if (second_condition_priority := request.forms.get('second_condition_priority')) == '':
+        second_condition_priority = -1
+    else:
+        second_condition_priority = int(second_condition_priority)
+
+    if (default_priority := request.forms.get('default_priority')) == '':
+        default_priority = -1
+    else:
+        default_priority = int(default_priority)
 
     for stream in config['streams']:
         if stream['name'] in choosen_channels:
             for url in stream['inputs']:
-                if first_condition in url['url'] and first_condition != '':
+                if first_condition in url['url'] and first_condition != '' and first_condition_priority > -1:
                     url['priority'] = first_condition_priority
-                elif second_condition in url['url'] and second_condition != '':
+                elif second_condition in url['url'] and second_condition != '' and second_condition_priority > -1:
                     url['priority'] = second_condition_priority
-                else:
+                elif default_priority > -1:
                     url['priority'] = default_priority
 
             changed_channels_list_update(session, stream['name'], 'inputs')
@@ -100,7 +135,7 @@ def stream_sorting(config: dict, choosen_channels: list, session: str):
     for stream in config['streams']:
         if stream['name'] in choosen_channels and request.forms.get(stream['name']) != '':
             stream['position'] = request.forms.get(stream['name'])
-            changed_channels_list_update(session, stream['name'], 'position')
+            changed_channels_list_update(session, stream['name'], 'position', request.forms.get(stream['name']))
 
     config['streams'].sort(key=lambda x: int(x.get('position')))
 
@@ -118,20 +153,14 @@ def config_upload_to_server_api(session: str):
     uploaded_config = redis_client.json().get('uploaded_config' + session, '.')
     changed_channels = redis_client.json().get('changed_channels' + session, '.')
 
-    for channel in changed_channels['changed_channels']:
-        name = channel['name']
-        entity = channel['entity']
-    
-    #changed_channels['changed_channels'] = [api_call(stream) in uploaded_config['streams'] if stream['name'] in changed_channels['changed_channels']]
+    for stream in uploaded_config['streams']:
+        for _, value in enumerate(changed_channels):
+            if stream['name'] == value['name']:
+                changed_keys = json.loads(''.join(('{"', value['entity'], '"', ':', json.dumps(value['changes'])+'}')))
+                api_call('streams/' + stream['name'], 'PUT', changed_keys, username, password)
 
-    #for stream in uploaded_config['streams']:
-    #    if stream['name'] in changed_channels['changed_channels']:
-    #        logger.info(json.loads('{' + changed_channels['changed_channels']['entity'] + ':' + stream[changed_channels['entity']] + '}'))
-    #        break
-    #        #api_call(''.join(('streams/', stream['name'])), 'PUT', json.loads('{' + changed_channels['entity'] + ':' + stream[changed_channels['entity']] + '}'), username, password)
-    #    logger.info('changes in %s not found', stream['name'])
-
-    #redis_client.delete('changed_channels' + session)
+    redis_client.delete('changed_channels' + session)
+    redis_client.delete('choosen_channels' + session)
 
     return template('templates/upload_api_complete.tpl')
 
@@ -146,7 +175,7 @@ def config_load_from_server_api(session: str):
 
     stream_call = api_call('streams?limit=1','GET', {}, username, password)
 
-    config = api_call(''.join(('streams?limit=', str(stream_call['estimated_count'] + 10))),'GET', {}, username, password)
+    config = api_call(''.join(('streams?limit=', str(stream_call['estimated_count']))),'GET', {}, username, password)
 
     redis_client.json().set('uploaded_config' + session, '.', config)
 

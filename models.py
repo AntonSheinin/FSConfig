@@ -2,16 +2,16 @@
 # pylint: disable=missing-class-docstring
 # pylint: disable=missing-function-docstring
 # pylint: disable=maybe-no-member
-# pylint: disable=line-too-long
 
 import logging
 from typing import Callable
 import requests
-from requests.auth import HTTPBasicAuth
 import redis
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+API_URL = 'http://193.176.179.222:8085/flussonic/api/v3/'
 
 redis_client = redis.Redis(host='redis', port=6379, db=0)
 
@@ -21,24 +21,22 @@ def api_call(query: str,
              username: str,
              password: str) -> dict:
 
-    url = 'http://193.176.179.222:8085/flussonic/api/v3/'
-
     if request_method == 'GET':
-        resp = requests.get(''.join((url, query)), auth = HTTPBasicAuth(username, password))
+        resp = requests.get(''.join((API_URL, query)), auth = (username, password))
         logger.info('Status code : %s', resp.status_code)
+        return resp.json()
 
-    elif request_method == 'PUT':
-        resp = requests.put(''.join((url, query)), json = json_payload, auth = HTTPBasicAuth(username, password))
+    if request_method == 'PUT':
+        resp = requests.put(''.join((API_URL, query)), json = json_payload, auth = (username, password))
         logger.info('Status code : %s', resp.status_code)
+        return resp.json()
 
-    else:
-        print('request method not supported')
-
-    return resp.json()
+    logger.info('request method not supported')
+    return {}
 
 
 def config_load_update(func: Callable) -> Callable:
-    def wrapper(session: str) -> list:
+    def wrapper(session: str):
 
         uploaded_config = {}
 
@@ -54,13 +52,20 @@ def config_load_update(func: Callable) -> Callable:
     return wrapper
 
 
-def changed_channels_list_update(session: str, channel_name: str, channel_entity: str) -> None:
+def changed_channels_list_update(session: str,
+                                 channel_name: str,
+                                 channel_entity: str,
+                                 channel_changes
+                                ) -> None:
 
     changed_channels = []
 
     if redis_client.exists('changed_channels' + session):
         changed_channels = redis_client.json().get('changed_channels' + session, '.')
-        
-    changed_channels.append({'name' : channel_name, 'entity' : channel_entity})
+
+    changed_channels.append({'name' : channel_name,
+                             'entity' : channel_entity,
+                             'changes': channel_changes
+                            })
 
     redis_client.json().set('changed_channels' + session, '.', changed_channels)

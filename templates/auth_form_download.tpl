@@ -3,7 +3,7 @@
 
 <form action="/config-load-api" method="post" enctype="multipart/form-data">
 	Username : <input type="text" name="username" required />
-	Password :  <input type="text" name="password" required /><br><br>       
+	Password : <input type="text" name="password" required /><br><br>       
                   
- 	 <input type="submit" value="Submit" />
+ 	<input type="submit" value="Submit" />
 </form>
