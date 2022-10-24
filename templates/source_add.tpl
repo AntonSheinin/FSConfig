@@ -1,9 +1,7 @@
 % rebase('templates/main_menu.tpl')
 <br>
 
-<form action="/direct-api-query" method="post" enctype="multipart/form-data">
-    API Query : <input type="text" name="api_query" size="60" required /><br><br>
-
+<form action="/source-add" method="post" enctype="multipart/form-data">
 	Username : <input type="text" name="username" required />
 	Password :  <input type="text" name="password" required /><br><br>       
                   

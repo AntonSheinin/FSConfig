@@ -9,7 +9,7 @@ import logging
 from bottle import route, request, default_app, response
 from controllers import (
     direct_api_query, main_menu, choose_channels, dvr_settings, source_priority, stream_sorting,
-    load_config_file_json, download_config_file_json, config_upload_to_server_api,
+    load_config_file_json, download_config_file_json, config_upload_to_server_api, source_add,
     config_load_from_server_api
 )
 
@@ -22,6 +22,7 @@ ALLOWED_IP = ['127.0.0.1', '62.90.52.94', '94.130.136.116', '10.100.102.6', '10.
 menu_links = {'main-menu' : main_menu,
               'choose-channels' : choose_channels,
               'direct-api-query' : direct_api_query,
+              'source-add' : source_add,
               'dvr-settings' : dvr_settings,
               'source-priority' : source_priority,
               'stream-sorting' : stream_sorting,
@@ -55,6 +56,7 @@ def router(url: str):
     if url in menu_links:
         return menu_links[url](session_id)
 
+    logger.info(url)
     return http_error_handling(404)
 
 

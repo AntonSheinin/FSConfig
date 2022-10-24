@@ -41,6 +41,7 @@
   <div class="topnav">
     <a class="active" href="/choose-channels">Choose Channels</a>
     <a href="/direct-api-query">Direct API Query</a>
+    <a href="/source-add">Source Add</a>
     <a href="/dvr-settings">DVR Settings</a>
     <a href="/source-priority">Source Priority</a>
     <a href="/stream-sorting">Stream Sorting</a>

@@ -54,6 +54,36 @@ def direct_api_query(session: str):
 
     return template('templates/direct_api_query_complete.tpl')
 
+
+def source_add(session: str):
+
+    if request.method == 'GET':
+        return template('templates/source_add.tpl')
+
+    choosen_channels = redis_client.lrange('choosen_channels' + session, 0, -1)
+    choosen_channels = [channel.decode('utf-8') for channel in choosen_channels]
+    uploaded_config = redis_client.json().get('uploaded_config' + session, '.')
+
+    username = request.forms.get('username')
+    password = request.forms.get('password')
+
+    for stream in uploaded_config['streams']:
+        if stream['name'] in choosen_channels:
+            if not [source for source in stream['inputs'] if 'sby04' in source['url']]:
+                for source in stream['inputs']:
+                    if 'sby01' in source['url']:
+                        new_source = 'tshttp://sby04.gmdostavka.ru:'+source['url'][-5:]
+                        query = f'{{"inputs" : [{{"$index" : 10, "url" : "{new_source}", "priority" : 0}}]}}'
+                        logger.info(query)
+                        api_call('streams/' + stream['name'], 'PUT', json.loads(query), username, password)
+                        break
+
+    redis_client.delete('uploaded_config' + session)
+    redis_client.delete('choosen_channels' + session)
+
+    return template('templates/source_add_complete.tpl')
+
+
 @config_load_update
 def dvr_settings(config: dict, choosen_channels: list, session: str):
 
@@ -69,15 +99,13 @@ def dvr_settings(config: dict, choosen_channels: list, session: str):
 
     for stream in config['streams']:
         if stream['name'] in choosen_channels:
-            changed['dvr'] = {
-                             "disk_space" : disc_space_limit_gb,
-                             "disk_limit" : disc_space_limit_perc,
-                             "disk_usage_limit" : disc_space_limit_perc,
-                             "dvr_limit" : dvr_limit,
-                             "expiration" : dvr_limit,
-                             "root" : dvr_root,
-                             "storage_limit" : disc_space_limit_gb
-                             }
+            changed['dvr'] = {"disk_space" : disc_space_limit_gb,
+                              "disk_limit" : disc_space_limit_perc,
+                              "disk_usage_limit" : disc_space_limit_perc,
+                              "dvr_limit" : dvr_limit,
+                              "expiration" : dvr_limit,
+                              "root" : dvr_root,
+                              "storage_limit" : disc_space_limit_gb}
 
             if dvr_limit == 0:
                 del stream['dvr']
@@ -121,7 +149,9 @@ def source_priority(config: dict, choosen_channels: list, session: str):
                 elif default_priority > -1:
                     url['priority'] = default_priority
 
-            changed_channels_list_update(session, stream['name'], 'inputs')
+            stream['inputs'].sort(key=lambda x: int(x.get('priority')))
+
+            #changed_channels_list_update(session, stream['name'], 'inputs')
 
     return template('templates/source_priority_complete.tpl'), config
 
