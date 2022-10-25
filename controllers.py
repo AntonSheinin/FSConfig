@@ -139,6 +139,8 @@ def source_priority(config: dict, choosen_channels: list, session: str):
     else:
         default_priority = int(default_priority)
 
+    logger.info(choosen_channels)
+
     for stream in config['streams']:
         if stream['name'] in choosen_channels:
             for url in stream['inputs']:

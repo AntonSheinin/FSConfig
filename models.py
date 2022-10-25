@@ -47,8 +47,7 @@ def config_load_update(func: Callable) -> Callable:
         output = func(uploaded_config, choosen_channels, session)
 
         redis_client.json().set('uploaded_config' + session, '.', output[1])
-        redis_client.delete('choosen_channels' + session)
-
+        
         return output[0]
 
     return wrapper
@@ -57,8 +56,7 @@ def config_load_update(func: Callable) -> Callable:
 def changed_channels_list_update(session: str,
                                  channel_name: str,
                                  channel_entity: str,
-                                 channel_changes
-                                ) -> None:
+                                 channel_changes) -> None:
 
     changed_channels = []
 
